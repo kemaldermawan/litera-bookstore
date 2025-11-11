@@ -15,9 +15,20 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 
 app.get("/", (req, res) => {
-  return res.render("pages/index");
+    return res.render("pages/index");
 });
 
+app.get("/cart", (req, res) => {
+    return res.render("pages/cart");
+});
+
+app.get("/profile", (req, res) => {
+    return res.render("pages/profile");
+});
+
+app.get("/login", (req, res) => {
+    return res.render("pages/login");
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
