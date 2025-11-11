@@ -1,6 +1,86 @@
 <%- include('../partials/navbar') %>
-<div>
-    <h1>Welcome to LITERA Book Store</h1>
-    <p>Profil📚</p>
+
+<div class="container mt-4">
+    <h1 class="mb-4">Profil Saya</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Informasi Akun</h5>
+            <p><strong>Username:</strong></p>
+            <p><strong>Email:</strong></p>
+            <p><strong>No. HP:</strong></p>
+
+            <hr>
+            <a href="#" class="btn btn-danger rounded-pill btn-logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Alamat Pengiriman Utama</h5>
+            <form action="#" method="POST">
+                <div class="mb-3">
+                    <label for="street" class="form-label">Jalan</label>
+                    <input type="text" class="form-control" id="street">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="city" class="form-label">Kota</label>
+                        <input type="text" class="form-control" id="city">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="province" class="form-label">Provinsi</label>
+                        <input type="text" class="form-control" id="province"">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="postalCode" class="form-label">Kode Pos</label>
+                        <input type="text" class="form-control" id="postalCode">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary rounded-pill">Simpan Alamat</button>
+            </form>
+        </div>
+    </div>
+
+    <h3 class="mb-3">Riwayat Transaksi</h3>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header d-flex flex-wrap justify-content-between">
+                <div>
+                    <strong>Pesanan:</strong>
+                </div>
+                <div>
+                    <strong>Tanggal:</strong>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex align-items-center">
+                        <img src="#" alt="#" style="width: 50px; height: 75px; object-fit: cover; margin-right: 15px;">
+                        <div class="me-auto">
+                            <br>
+                            <small class="text-muted"></small>
+                        </div>
+                        <div class="ms-3 text-end">
+                            <button class="btn btn-sm btn-success rounded-pill" disabled>Sudah Diulas</button>
+                            <a href="#" class="btn btn-sm btn-primary rounded-pill text-white">
+                                Tulis Ulasan
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Status:</strong>
+                        <span class="badge bg-success">Selesai</span>
+                        <span class="badge bg-danger">Dibatalkan</span>
+                        <span class="badge bg-warning text-dark">Pending</span>
+                </div>
+                <h5 class="mb-0">Total: <span class="text-primary fw-bold">Rp</span></h5>
+            </div>
+        </div>
 </div>
+
 <%- include('../partials/footer') %>
