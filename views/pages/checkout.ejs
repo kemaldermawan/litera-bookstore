@@ -1,6 +1,99 @@
 <%- include('../partials/navbar') %>
 
-<h1>Welcome to LITERA Book Store</h1>
-<p>Tempat terbaik untuk menemukan buku favoritmu 📚</p>
+<div class="container mt-5">
+    <div class="row g-5">
+        
+        <div class="col-md-7">
+        <h2 class="mb-4">Detail Checkout</h2>
+        
+        <form action="/checkout" method="POST" id="checkoutForm">
+            
+            <input type="hidden" name="isBuyNow">
+            
+            <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4">
+                <h5 class="card-title">Alamat Pengiriman</h5>
+                <p class="mb-1"><strong></strong></p>
+                <p class="text-muted mb-1">
+                </p>
+                <a href="/profile" class="small text-decoration-none">Ubah Alamat di Profil</a>
+                <p class="text-danger">Alamat atau No. HP Anda belum lengkap.</p>
+                <a href="/profile" class="btn btn-sm btn-primary rounded-pill">Isi Alamat & No. HP di Profil</a>
+            </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-3">Metode Pembayaran</h5>
+                <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="payCOD" value="COD" checked>
+                <label class="form-check-label" for="payCOD">
+                    Cash on Delivery (COD)
+                </label>
+                </div>
+                <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="payTransfer" value="Bank Transfer">
+                <label class="form-check-label" for="payTransfer">
+                    Bank Transfer
+                </label>
+                </div>
+                <div class="form-check">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="payEwallet" value="E-Wallet">
+                <label class="form-check-label" for="payEwallet">
+                    E-Wallet (OVO/GoPay)
+                </label>
+                </div>
+            </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-none mt-4">
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill">Buat Pesanan</button>
+            </div>
+        </form>
+        </div>
+
+        <div class="col-md-5">
+        <div class="card shadow-sm border-0 position-sticky" style="top: 100px;">
+            <div class="card-body p-4">
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Pesanan Anda</h5>
+                <a href="/cart" class="small text-decoration-none">Edit Keranjang</a>
+            </div>
+            <ul class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                <li class="list-group-item d-flex align-items-center px-0">
+                    <img src="#" style="width: 50px; height: 75px; object-fit: cover; border-radius: 4px;" class="me-3">
+                    <div class="me-auto">
+                    <div class="fw-bold"></div>
+                    <small class="text-muted"></small>
+                    </div>
+                    <span class="fw-bold">Rp</span>
+                </li>
+            </ul>
+
+            <ul class="list-group list-group-flush summary-list mt-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                Subtotal
+                <strong>Rp</strong>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                Biaya Pengiriman
+                <span class="text-success">Gratis</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0 fs-5 fw-bold border-top pt-3">
+                Total
+                <strong>Rp</strong>
+                </li>
+            </ul>
+
+            <div class="d-grid mt-4 d-none d-md-block">
+                <button type="submit" form="checkoutForm" class="btn btn-primary btn-lg rounded-pill">Buat Pesanan</button>
+            </div>
+            </div>
+        </div>
+        </div>
+
+    </div>
+</div>
 
 <%- include('../partials/footer') %>
