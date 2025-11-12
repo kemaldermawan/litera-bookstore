@@ -15,7 +15,7 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 
 app.get("/", (req, res) => {
-    return res.render("pages/index");
+    return res.render("pages/landing");
 });
 
 app.get("/cart", (req, res) => {
