@@ -34,5 +34,9 @@ app.get("/register", (req, res) => {
     return res.render("pages/register");
 });
 
+app.get("/index", (req, res) => {
+    return res.render("pages/index");
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
