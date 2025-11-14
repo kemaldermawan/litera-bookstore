@@ -38,5 +38,21 @@ app.get("/index", (req, res) => {
     return res.render("pages/index");
 });
 
+app.get("/bookDetail", (req, res) => {
+    return res.render("pages/bookDetail");
+});
+
+app.get("/orderSuccess", (req, res) => {
+    return res.render("pages/orderSuccess");
+});
+
+app.get("/checkout", (req, res) => {
+    return res.render("pages/checkout");
+});
+
+app.get("/review", (req, res) => {
+    return res.render("pages/review");
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
