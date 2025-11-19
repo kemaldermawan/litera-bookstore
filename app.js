@@ -7,6 +7,8 @@ const methodOverride = require('method-override');
 const MongoStore = require('connect-mongo');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
+const homeRoutes = require("./routes/homeRoutes");
+const bookRoutes = require("./routes/bookRoutes");
 
 dotenv.config();
 
@@ -18,10 +20,8 @@ app.set("views", "./views");
 app.set("view engine", "ejs");
 
 app.use(express.static("public"));
-
-app.get("/", (req, res) => {
-    return res.render("pages/home");
-});
+app.use("/", homeRoutes);
+// app.use("/book", bookRoutes);
 
 app.get("/cart", (req, res) => {
     return res.render("pages/cart");
