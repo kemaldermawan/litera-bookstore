@@ -55,5 +55,13 @@ app.get("/review", (req, res) => {
     return res.render("pages/review");
 });
 
+app.get("/dashboard", (req, res) => {
+    return res.render("admin/dashboard");
+});
+
+app.get("/editBook", (req, res) => {
+    return res.render("admin/editBook");
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

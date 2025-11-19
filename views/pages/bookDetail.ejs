@@ -28,21 +28,37 @@
             </div>
 
             <div class="action-buttons-container mb-3">
-                <a href="#" class="btn btn-outline-primary rounded-pill mb-2 me-4">
+
+                <!-- Edit Buku -->
+                <a href="/editBook" 
+                   class="btn btn-outline-primary rounded-pill mb-2 me-4">
                     Edit Buku
                 </a>
-                <button class="btn btn-secondary rounded-pill mb-2" disabled>Stok Habis</button>
+            
+                <!-- Stok Habis -->
+                <button class="btn btn-secondary rounded-pill mb-2" disabled>
+                    Stok Habis
+                </button>
+            
+                <!-- Add to Cart & Buy Now -->
                 <div class="d-flex align-items-center gap-3">
-                    <button type="button" class="btn btn-outline-primary rounded-pill" id="addToCartBtn" data-book-id="#">
-                    Add to Cart
-                    </button>
-                    <form action="#" method="POST" class="d-inline">
-                    <button type="submit" class="btn btn-primary rounded-pill">Buy Now
-                        <a href="/checkout" class="stretched-link"></a>
-                    </button>
+            
+                    <!-- Add to Cart -->
+                    <a href="/cart" 
+                       class="btn btn-outline-primary rounded-pill">
+                        Add to Cart
+                    </a>
+            
+                    <!-- Buy Now -->
+                    <form action="/checkout" method="GET" class="d-inline">
+                        <button type="submit" class="btn btn-primary rounded-pill">
+                            Buy Now
+                        </button>
                     </form>
                 </div>
+            
             </div>
+            
             </div>
         </div>
         </div>
