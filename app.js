@@ -1,17 +1,11 @@
 const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
-const session = require('express-session');
-const flash = require('connect-flash');
-const methodOverride = require('method-override');
-const MongoStore = require('connect-mongo');
-const morgan = require('morgan');
 const connectDB = require('./config/db');
-const homeRoutes = require("./routes/homeRoutes");
+// Gunakan route yang baru kita buat
 const bookRoutes = require("./routes/bookRoutes");
 
 dotenv.config();
-
 connectDB();
 
 const app = express();
@@ -20,48 +14,16 @@ app.set("views", "./views");
 app.set("view engine", "ejs");
 
 app.use(express.static("public"));
-app.use("/", homeRoutes);
-// app.use("/book", bookRoutes);
 
-app.get("/cart", (req, res) => {
-    return res.render("pages/cart");
-});
+// Gunakan bookRoutes untuk halaman utama
+app.use("/", bookRoutes);
 
-app.get("/profile", (req, res) => {
-    return res.render("pages/profile");
-});
-
-app.get("/login", (req, res) => {
-    return res.render("pages/login");
-});
-
-app.get("/register", (req, res) => {
-    return res.render("pages/register");
-});
-
-app.get("/bookDetail", (req, res) => {
-    return res.render("pages/bookDetail");
-});
-
-app.get("/orderSuccess", (req, res) => {
-    return res.render("pages/orderSuccess");
-});
-
-app.get("/checkout", (req, res) => {
-    return res.render("pages/checkout");
-});
-
-app.get("/review", (req, res) => {
-    return res.render("pages/review");
-});
-
-app.get("/dashboard", (req, res) => {
-    return res.render("admin/dashboard");
-});
-
-app.get("/editBook", (req, res) => {
-    return res.render("admin/editBook");
-});
+// Route statis lainnya (bisa dipindahkan ke controller nanti)
+app.get("/cart", (req, res) => res.render("pages/cart"));
+app.get("/login", (req, res) => res.render("pages/login"));
+app.get("/register", (req, res) => res.render("pages/register"));
+app.get("/profile", (req, res) => res.render("pages/profile"));
+// ... dst
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
