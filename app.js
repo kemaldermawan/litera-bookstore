@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+// Gunakan route yang baru kita buat
 const bookRoutes = require("./routes/bookRoutes");
 
 dotenv.config();
@@ -22,7 +23,7 @@ app.get("/cart", (req, res) => res.render("pages/cart"));
 app.get("/login", (req, res) => res.render("pages/login"));
 app.get("/register", (req, res) => res.render("pages/register"));
 app.get("/profile", (req, res) => res.render("pages/profile"));
-
+// ... dst
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
