@@ -23,7 +23,10 @@ app.get("/cart", (req, res) => res.render("pages/cart"));
 app.get("/login", (req, res) => res.render("pages/login"));
 app.get("/register", (req, res) => res.render("pages/register"));
 app.get("/profile", (req, res) => res.render("pages/profile"));
-// ... dst
+app.get("/bookDetail", (req, res) => res.render("pages/bookDetail"));
+app.get("/checkout", (req, res) => res.render("pages/checkout"));
+app.get("/orderSuccess", (req, res) => res.render("pages/orderSuccess"));
+app.get("/review", (req, res) => res.render("pages/review"));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
