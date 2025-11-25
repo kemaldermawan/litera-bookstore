@@ -27,6 +27,8 @@ app.get("/bookDetail", (req, res) => res.render("pages/bookDetail"));
 app.get("/checkout", (req, res) => res.render("pages/checkout"));
 app.get("/orderSuccess", (req, res) => res.render("pages/orderSuccess"));
 app.get("/review", (req, res) => res.render("pages/review"));
+app.get("/dashboard", (req, res) => res.render("admin/dashboard"));
+app.get("/editBook", (req, res) => res.render("admin/editBook"));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
