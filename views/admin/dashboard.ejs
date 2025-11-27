@@ -24,31 +24,31 @@
                         
                         <h4 class="mb-3">Tambah Buku Baru</h4>
                         <div class="p-3 mb-4 border rounded">
-                            <form>
+                            <form action="/admin/books/create" method="POST" enctype="multipart/form-data">
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <label for="judul" class="form-label">Judul Buku</label>
-                                        <input type="text" class="form-control" id="judul" required>
+                                        <input type="text" class="form-control" id="judul" name="judul" required>
                                     </div>
                                     <div class="col-12">
                                         <label for="penulis" class="form-label">Penulis</label>
-                                        <input type="text" class="form-control" id="penulis" required>
+                                        <input type="text" class="form-control" id="penulis" name="penulis" required>
                                     </div>
                                     <div class="col-12">
                                         <label for="sinopsis" class="form-label">Sinopsis</label>
-                                        <textarea class="form-control" id="sinopsis" rows="3"></textarea>
+                                        <textarea class="form-control" id="sinopsis" name="sinopsis" rows="3"></textarea>
                                     </div>
                                     <div class="col-md-3">
                                         <label for="harga" class="form-label">Harga</label>
-                                        <input type="text" class="form-control" id="harga" required>
+                                        <input type="text" class="form-control" id="harga" name="harga" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label for="stok" class="form-label">Stok</label>
-                                        <input type="number" class="form-control" id="stok" required>
+                                        <input type="number" class="form-control" id="stok" name="stok" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label for="kategori" class="form-label">Kategori</label>
-                                        <select id="kategori" class="form-select">
+                                        <select id="kategori" class="form-select" name="kategori">
                                             <option selected>Fiksi</option>
                                             <option>Non-Fiksi</option>
                                             <option>Edukasi</option>
@@ -56,7 +56,7 @@
                                     </div>
                                     <div class="col-md-3">
                                         <label for="cover" class="form-label">File Cover Buku</label>
-                                        <input type="file" class="form-control" id="cover">
+                                        <input type="file" class="form-control" id="cover" name="coverImage">
                                     </div>
                                     <div class="col-12 text-end">
                                         <button type="submit" class="btn btn-success">Tambah Buku</button>
@@ -79,31 +79,28 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <% 
-                                        const books = [
-                                            { cover: 'placeholder.jpg', title: 'Steve Jobs', author: 'Walter Isaacson', stock: 5 },
-                                            { cover: 'placeholder.jpg', title: 'Can\'t Hurt Me', author: 'David Goggins', stock: 10 },
-                                            { cover: 'placeholder.jpg', title: 'The Power of Habit', author: 'Charles Duhigg', stock: 12 },
-                                            { cover: 'placeholder.jpg', title: 'Sapiens', author: 'Yuval Noah Harari', stock: 8 },
-                                            { cover: 'placeholder.jpg', title: 'Atomic Habits', author: 'James Clear', stock: 25 },
-                                            { cover: 'placeholder.jpg', title: 'Educated', author: 'Tara Westover', stock: 18 },
-                                            { cover: 'placeholder.jpg', title: 'The Hitchhiker\'s Guide to the Galaxy', author: 'Douglas Adams', stock: 3 },
-                                            { cover: 'placeholder.jpg', title: 'The Lord of the Rings', author: 'J.R.R. Tolkien', stock: 7 }
-                                        ];
-                                        books.forEach(book => { 
-                                        %>
+                                        <% books.forEach(book => { %>
                                         <tr>
-                                            <td><img src="<%= book.cover %>" alt="<%= book.title %> Cover" class="img-thumbnail" style="width: 40px; height: 60px; object-fit: cover;"></td>
+                                            <td>
+                                                <img src="<%= book.coverImage %>" 
+                                                     class="img-thumbnail" 
+                                                     style="width:40px; height:60px; object-fit:cover;">
+                                            </td>
                                             <td><strong><%= book.title %></strong></td>
                                             <td><%= book.author %></td>
                                             <td><span class="badge bg-primary"><%= book.stock %></span></td>
                                             <td>
-                                                <button class="btn btn-sm btn-warning">Edit</button>
-                                                <button class="btn btn-sm btn-danger">Hapus</button>
+                                                <a href="/admin/books/edit/<%= book._id %>" class="btn btn-sm btn-warning">Edit</a>
+                                    
+                                                <form action="/admin/books/delete/<%= book._id %>" 
+                                                      method="POST" 
+                                                      style="display:inline-block;">
+                                                    <button class="btn btn-sm btn-danger">Hapus</button>
+                                                </form>
                                             </td>
                                         </tr>
                                         <% }) %>
-                                        </tbody>
+                                    </tbody>                                    
                                 </table>
                             </div>
                         </div>

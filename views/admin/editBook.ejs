@@ -1,73 +1,118 @@
 <%- include('../partials/navbarAdmin') %> 
-    <div class="container py-5">
-        <section class="p-4 p-md-5 bg-white border rounded shadow-sm">
-            
-            <h2 class="card-title mb-4">Edit Buku:</h2>
-            <p class="text-muted mb-4">Ubah informasi buku di bawah ini dan tekan "Update Buku" untuk menyimpan perubahan.</p>
+<div class="container py-5">
+    <section class="p-4 p-md-5 bg-white border rounded shadow-sm">
+        
+        <h2 class="card-title mb-4">Edit Buku:</h2>
+        <p class="text-muted mb-4">Ubah informasi buku di bawah ini dan tekan "Update Buku" untuk menyimpan perubahan.</p>
 
-            <form action="#" method="POST" enctype="multipart/form-data">
+        <!-- ACTION diarahkan ke controller update -->
+        <form action="/admin/books/update/<%= book._id %>" method="POST" enctype="multipart/form-data">
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="judul" class="form-label">Judul Buku</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="judul" 
+                        name="judul" 
+                        value="<%= book.title %>" 
+                        required
+                    >
+                </div>
+
+                <div class="col-md-6">
+                    <label for="penulis" class="form-label">Penulis</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="penulis" 
+                        name="penulis" 
+                        value="<%= book.author %>" 
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-12">
+                    <label for="sinopsis" class="form-label">Sinopsis</label>
+                    <textarea 
+                        class="form-control" 
+                        id="sinopsis" 
+                        name="sinopsis" 
+                        rows="3" 
+                        required
+                    ><%= book.synopsis %></textarea>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4 align-items-end">
                 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="judul" class="form-label">Judul Buku</label>
-                        <input type="text" class="form-control" id="judul" name="judul" value="Judul Buku Saat Ini" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="penulis" class="form-label">Penulis</label>
-                        <input type="text" class="form-control" id="penulis" name="penulis" value="Penulis Saat Ini" required>
-                    </div>
+                <div class="col-md-3 col-6">
+                    <label for="harga" class="form-label">Harga</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="harga" 
+                        name="harga" 
+                        value="<%= book.price %>" 
+                        required
+                    >
                 </div>
-
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <label for="sinopsis" class="form-label">Sinopsis</label>
-                        <textarea class="form-control" id="sinopsis" name="sinopsis" rows="3" required>Sinopsis lengkap buku yang akan diedit. Bagian ini bisa sangat panjang.</textarea>
-                    </div>
+                
+                <div class="col-md-3 col-6">
+                    <label for="stok" class="form-label">Stok</label>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="stok" 
+                        name="stok" 
+                        value="<%= book.stock %>" 
+                        required
+                    >
                 </div>
-
-                <div class="row g-3 mb-4 align-items-end">
-                    
-                    <div class="col-md-3 col-6">
-                        <label for="harga" class="form-label">Harga</label>
-                        <input type="text" class="form-control" id="harga" name="harga" value="Rp120.000" required>
-                    </div>
-                    
-                    <div class="col-md-3 col-6">
-                        <label for="stok" class="form-label">Stok</label>
-                        <input type="number" class="form-control" id="stok" name="stok" value="15" required>
-                    </div>
-                    
-                    <div class="col-md-3 col-6">
-                        <label for="kategori" class="form-label">Kategori</label>
-                        <select id="kategori" name="kategori" class="form-select">
-                            <option value="Fiksi" selected>Fiksi</option>
-                            <option value="Non-Fiksi">Non-Fiksi</option>
-                            <option value="Edukasi">Edukasi</option>
-                        </select>
-                    </div>
-                    
-                    <div class="col-md-3 col-6">
-                        <label for="ganti_cover" class="form-label">Ganti Cover</label>
-                        <input type="file" class="form-control" id="ganti_cover" name="cover">
-                    </div>
+                
+                <div class="col-md-3 col-6">
+                    <label for="kategori" class="form-label">Kategori</label>
+                    <select id="kategori" name="kategori" class="form-select">
+                        <option value="Fiksi" <%= book.category === 'Fiksi' ? 'selected' : '' %>>Fiksi</option>
+                        <option value="Non-Fiksi" <%= book.category === 'Non-Fiksi' ? 'selected' : '' %>>Non-Fiksi</option>
+                        <option value="Edukasi" <%= book.category === 'Edukasi' ? 'selected' : '' %>>Edukasi</option>
+                    </select>
                 </div>
-
-                <hr class="mt-4 mb-4">
-
-                <div class="row justify-content-end g-3">
-                    <div class="col-auto">
-                        <a href="#" class="btn btn-outline-danger btn-lg">Batal</a>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary btn-lg">Update Buku</button>
-                    </div>
+                
+                <div class="col-md-3 col-6">
+                    <label for="ganti_cover" class="form-label">Ganti Cover</label>
+                    <input 
+                        type="file" 
+                        class="form-control" 
+                        id="ganti_cover" 
+                        name="coverImage"
+                    >
+                    <small class="text-muted d-block mt-1">
+                        Cover saat ini: <%= book.cover %>
+                    </small>
                 </div>
+            </div>
 
-            </form>
-            
-        </section>
-    </div>
-    <script src="/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/main.js"></script>
+            <hr class="mt-4 mb-4">
+
+            <div class="row justify-content-end g-3">
+                <div class="col-auto">
+                    <a href="/admin/books" class="btn btn-outline-danger btn-lg">Batal</a>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary btn-lg">Update Buku</button>
+                </div>
+            </div>
+
+        </form>
+        
+    </section>
+</div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/main.js"></script>
 </body>
 </html>

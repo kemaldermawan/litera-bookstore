@@ -32,7 +32,7 @@ module.exports = {
                 scifi,
                 mystery,
                 biography,
-                user: null // Minggu 11: Belum ada sistem login
+                user: null 
             });
 
         } catch (err) {
@@ -59,18 +59,16 @@ module.exports = {
                 return res.status(404).send("Buku tidak ditemukan");
             }
 
-            // Ambil buku terkait (Rekomendasi) untuk Minggu 11
-            // Menampilkan buku lain dari kategori yang sama
             const relatedBooks = await Book.find({
                 category: book.category,
-                _id: { $ne: book._id } // Jangan tampilkan buku yang sedang dibuka
+                _id: { $ne: book._id } 
             }).limit(4).lean();
 
             res.render('pages/bookDetail', { 
                 pageTitle: book.title,
                 book: book,
                 relatedBooks: relatedBooks,
-                user: null // Minggu 11: Belum ada sistem login
+                user: null 
             });
 
         } catch (err) {
