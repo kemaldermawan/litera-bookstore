@@ -1,132 +1,156 @@
 <%- include('../partials/navbar') %>
-    <div class="book-detail-hero">
-        <div class="container">
+
+<div class="book-detail-hero">
+    <div class="container">
         <div class="row align-items-center g-5">
+
+            <!-- COVER -->
             <div class="col-md-4 text-center">
-            <img src="https://picsum.photos/200/300?random=1" 
-                alt="#" 
-                class="img-fluid book-cover-large">
+                <img src="<%= book.coverImage %>"
+                     alt="<%= book.title %>"
+                     class="img-fluid book-cover-large mt-5"
+                     style="max-width: 220px; border-radius: 8px; ">
             </div>
-            <div class="col-md-8 mt-4 mt-md-0">
-            <h1 class="detail-title"></h1>
-            <p class="detail-author"></p>
-            
-            <div class="d-flex align-items-center mb-3">
-                <div class="star-rating-display me-2" style="font-size: 1.1rem;">
+
+            <!-- DETAIL BUKU -->
+            <div class="col-md-8 mt-4 mt-md-0 align-title">
+                <h1 class="detail-title"><%= book.title %></h1>
+                <p class="detail-author">Oleh <%= book.author %></p>
+
+                <div class="d-flex align-items-center mb-3">
+                    <span class="fs-6 text-muted">( <%= book.numReviews %> Ulasan )</span>
+                    <span class="fs-6 text-muted ms-3">|</span>
+                    <span class="fs-6 text-muted ms-3">Terjual <%= book.salesCount %></span>
                 </div>
-                <span class="fs-6 text-muted">(Ulasan)</span>
-                <span class="fs-6 text-muted ms-3">|</span>
-                <span class="fs-6 text-muted ms-3">Terjual</span>
-            </div>
-            <h2 class="detail-price">Rp</h2>
 
-            <div class="d-flex gap-3 mb-4">
-                <span class="badge bg-success fs-6">Stok Saat Ini:</span>
-                <span class="badge bg-warning text-dark fs-6">Stok tersisa:</span>
-                <span class="badge bg-success fs-6">Stok tersedia</span>
-                <span class="badge bg-danger fs-6">Stok Habis</span>
-            </div>
+                <h2 class="detail-price">Rp <%= book.price.toLocaleString() %></h2>
 
-            <div class="action-buttons-container mb-3">
+                <!-- STATUS STOK -->
+                <div class="d-flex gap-3 mb-4">
+                    <% if (book.stock > 10) { %>
+                        <span class="badge bg-success fs-6">Stok tersedia</span>
+                    <% } else if (book.stock > 0) { %>
+                        <span class="badge bg-warning text-dark fs-6">Sisa <%= book.stock %></span>
+                    <% } else { %>
+                        <span class="badge bg-danger fs-6">Stok Habis</span>
+                    <% } %>
+                </div>
 
-                <!-- Edit Buku -->
-                <a href="/editBook" 
-                   class="btn btn-outline-primary rounded-pill mb-2 me-4">
-                    Edit Buku
-                </a>
-            
-                <!-- Stok Habis -->
-                <button class="btn btn-secondary rounded-pill mb-2" disabled>
-                    Stok Habis
-                </button>
-            
-                <!-- Add to Cart & Buy Now -->
-                <div class="d-flex align-items-center gap-3">
-            
-                    <!-- Add to Cart -->
-                    <a href="/cart" 
-                       class="btn btn-outline-primary rounded-pill">
-                        Add to Cart
+                <!-- BUTTONS -->
+                <div class="action-buttons-container mb-3">
+
+                    <!-- EDIT -->
+                    <a href="/admin/books/edit/<%= book._id %>"
+                       class="btn btn-outline-primary rounded-pill mb-2 me-4">
+                        Edit Buku
                     </a>
-            
-                    <!-- Buy Now -->
-                    <form action="/checkout" method="GET" class="d-inline">
-                        <button type="submit" class="btn btn-primary rounded-pill">
-                            Buy Now
+
+                    <% if (book.stock <= 0) { %>
+                        <button class="btn btn-secondary rounded-pill mb-2" disabled>
+                            Stok Habis
                         </button>
-                    </form>
+                    <% } else { %>
+                        <div class="d-flex align-items-center gap-3">
+                            <a href="/cart/add/<%= book._id %>" 
+                               class="btn btn-outline-primary rounded-pill">
+                                Add to Cart
+                            </a>
+
+                            <form action="/checkout" method="GET" class="d-inline">
+                                <button type="submit" class="btn btn-primary rounded-pill">
+                                    Buy Now
+                                </button>
+                            </form>
+                        </div>
+                    <% } %>
+
                 </div>
-            
+
             </div>
-            
-            </div>
-        </div>
         </div>
     </div>
+</div>
 
-    <div class="container my-5">
-        <div class="row">
-        
+<!-- SINOPSIS -->
+<div class="container my-5">
+    <div class="row">
+
         <div class="col-lg-7 about-section">
-            
             <h4 class="mb-4">Sinopsis</h4>
             <div class="about-content">
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
-                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud 
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-                Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
-                fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, 
-                sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <p><%= book.synopsis %></p>
             </div>
+
             <div class="mt-4">
-            <a href="#" class="book-tag"></a>
+                <span class="badge bg-info"><%= book.category %></span>
             </div>
 
-            <div class="mt-5">
             <hr class="my-5">
-            
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3>Ulasan Pengguna</h3>
-                
-                    <button type="button" class="btn btn-success rounded-pill me-2" disabled>
-                    Anda Sudah Memberi Ulasan
-                    </button>
-                    <a href="#" class="btn btn-primary rounded-pill text-white">
-                    Tulis Ulasan Anda
-                    </a>
-            </div>
 
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item mb-3 px-0">
-                        <strong>Test</strong>
-                        <span class="ms-2 text-warning">
-                        </span>
-                        <p class="mb-0 mt-1">Test</p>
-                    </li>
-                </ul>
+            <!-- ULASAN -->
+            <h3>Ulasan Pengguna</h3>
+
+            <% if (book.numReviews === 0) { %>
                 <p>Belum ada ulasan untuk buku ini.</p>
-            </div>
-        </div> <div class="col-lg-4 offset-lg-1 you-may-also-like">
+            <% } %>
+
+        </div>
+
+        <!-- RELATED BOOKS -->
+        <div class="col-lg-4 offset-lg-1 you-may-also-like">
             <h4 class="mb-4">You may also like</h4>
-            <div class="row related-books-container">
-                <div class="col-6 mb-4">
-                    <a href="#" class="text-decoration-none text-dark">
-                    <div class="card h-100">
-                        <img src="#" class="card-img-top">
-                        <div class="card-body p-0 pt-2">
-                        <h6 class="card-title mb-1">Title</h6>
-                        <p class="card-text">Author</p>
-                        <p class="card-text fw-bold">Rp</p>
-                        </div>
-                    </div>
-                    </a>
-                </div>
-                <div class="col-12">
+
+            <% if (relatedBooks.length === 0) { %>
                 <p class="text-muted">Tidak ada buku terkait.</p>
+            <% } else { %>
+
+            <!-- CAROUSEL -->
+            <div id="relatedBooksCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+
+                    <% for (let i = 0; i < relatedBooks.length; i += 2) { %>
+                        <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+                            <div class="row">
+
+                                <% const slideBooks = relatedBooks.slice(i, i + 2); %>
+
+                                <% slideBooks.forEach(rb => { %>
+                                <div class="col-6">
+                                    <a href="/store/book/<%= rb._id %>" class="text-decoration-none text-dark">
+                                        <div class="card small-related-card">
+                                            <img src="<%= rb.coverImage %>" class="card-img-top small-related-img">
+
+                                            <div class="card-body p-1">
+                                                <h6 class="card-title mb-1 small-related-title"><%= rb.title %></h6>
+                                                <p class="card-text small-related-author"><%= rb.author %></p>
+                                                <p class="card-text fw-bold small-related-price">
+                                                    Rp <%= rb.price.toLocaleString() %>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <% }) %>
+
+                            </div>
+                        </div>
+                    <% } %>
+
                 </div>
+
+                <!-- CONTROLS -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#relatedBooksCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#relatedBooksCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
             </div>
+            
+            <% } %>
         </div>
-        </div>
+
     </div>
+</div>
 
 <%- include('../partials/footer') %>

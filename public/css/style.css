@@ -30,3 +30,35 @@ footer.bg-dark {
     margin-top: 200px;
 }
 
+.small-related-card {
+    border-radius: 10px;
+    overflow: hidden;
+    height: 100%;
+}
+
+.small-related-img {
+    height: 220px;
+    object-fit: cover;
+}
+
+.small-related-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.small-related-author {
+    font-size: 0.75rem;
+    color: #777;
+    margin-bottom: 2px;
+}
+
+.small-related-price {
+    font-size: 0.85rem;
+}
+
+/* Sejajarkan judul dengan gambar pada layar medium ke atas */
+@media (min-width: 768px) {
+    .align-title {
+        padding-top: 70px; /* sesuaikan sampai pas */
+    }
+}
