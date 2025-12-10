@@ -40,10 +40,12 @@
                 <div class="action-buttons-container mb-3">
 
                     <!-- EDIT -->
-                    <a href="/admin/books/edit/<%= book._id %>"
-                       class="btn btn-outline-primary rounded-pill mb-2 me-4">
-                        Edit Buku
-                    </a>
+                    <% if (user && user.role === 'admin') { %>
+                        <a href="/admin/books/edit/<%= book._id %>"
+                           class="btn btn-outline-primary rounded-pill mb-2 me-4">
+                            Edit Buku
+                        </a>
+                    <% } %>
 
                     <% if (book.stock <= 0) { %>
                         <button class="btn btn-secondary rounded-pill mb-2" disabled>
