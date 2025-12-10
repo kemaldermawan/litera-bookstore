@@ -32,7 +32,7 @@ module.exports = {
                 scifi,
                 mystery,
                 biography,
-                user: null 
+                user: req.session.user || null 
             });
 
         } catch (err) {
@@ -68,12 +68,42 @@ module.exports = {
                 pageTitle: book.title,
                 book: book,
                 relatedBooks: relatedBooks,
-                user: null 
+                user: req.session.user || null 
             });
 
         } catch (err) {
             console.error("Error getting book detail:", err);
             res.redirect('/store');
         }
-    }
+    },
+
+    searchBooks: async (req, res) => {
+        try {
+            const q = req.query.q;
+    
+            if (!q) {
+                return res.redirect('/');
+            }
+    
+            const books = await Book.find({
+                $or: [
+                    { title: { $regex: q, $options: 'i' } },
+                    { author: { $regex: q, $options: 'i' } },
+                    { category: { $regex: q, $options: 'i' } }
+                ]
+            }).lean();
+    
+            res.render('pages/searchResult', {
+                pageTitle: `Hasil pencarian: ${q}`,
+                books,
+                keyword: q,
+                user: req.session.user || null
+            });
+    
+        } catch (err) {
+            console.error("Error search:", err);
+            res.redirect('/');
+        }
+    },    
 };
+

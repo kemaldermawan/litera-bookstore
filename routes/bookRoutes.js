@@ -11,4 +11,6 @@ router.get('/', (req, res) => {
     res.redirect('/store');
 });
 
+router.get("/search", bookController.searchBooks);
+
 module.exports = router;
