@@ -52,5 +52,49 @@
     <script src="/js/bootstrap.bundle.min.js"></script>
     
     <script src="/js/main.js"></script>
+    <script>
+        function formatRupiah(number) {
+            return number.toLocaleString('id-ID');
+        }
+    
+        const qtyInputs = document.querySelectorAll('.cart-qty');
+    
+        qtyInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                const parent = this.closest('.cart-item-row');
+                const priceElement = parent.querySelector('.total-price');
+                const price = parseInt(priceElement.dataset.price);
+                const qty = parseInt(this.value) || 0;
+    
+                // Update total per-item
+                priceElement.innerText = "Rp " + formatRupiah(price * qty);
+            });
+        });
+
+        function updateSummary() {
+            let subtotal = 0;
+            document.querySelectorAll('.total-price').forEach(item => {
+                const number = parseInt(item.innerText.replace(/\D/g, '')) || 0;
+                subtotal += number;
+            });
+
+            document.getElementById('subtotal').innerText = "Rp " + formatRupiah(subtotal);
+            document.getElementById('total').innerText = "Rp " + formatRupiah(subtotal); // free shipping
+        }
+
+        qtyInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                const parent = this.closest('.cart-item-row');
+                const priceElement = parent.querySelector('.total-price');
+                const price = parseInt(priceElement.dataset.price);
+                const qty = parseInt(this.value) || 0;
+
+                priceElement.innerText = "Rp " + formatRupiah(price * qty);
+
+                updateSummary();
+            });
+        });
+    </script>
+    
     </body>
 </html>

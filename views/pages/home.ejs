@@ -53,9 +53,11 @@
                                     <p class="text-muted small mb-2"><%= book.author %></p>
                                     <div class="mt-auto">
                                         <p class="fw-bold text-primary mb-2">Rp <%= book.price.toLocaleString('id-ID') %></p>
-                                        <button type="button" class="btn btn-primary btn-sm w-100 rounded-pill">
-                                            Tambah Keranjang
-                                        </button>
+                                        <form action="/cart/add/<%= book._id %>" method="POST">
+                                            <button class="btn btn-primary btn-sm w-100 rounded-pill" type="submit">
+                                                Tambah Keranjang
+                                            </button>
+                                        </form>                                        
                                     </div>
                                 </div>
                             </div>
@@ -97,9 +99,11 @@
                             <p class="text-muted small mb-2"><%= book.author %></p>
                             <div class="mt-auto">
                                 <p class="fw-bold text-primary mb-2">Rp <%= book.price.toLocaleString('id-ID') %></p>
-                                <button type="button" class="btn btn-primary btn-sm w-100 rounded-pill">
-                                    Tambah Keranjang
-                                </button>
+                                <form action="/cart/add/<%= book._id %>" method="POST">
+                                    <button class="btn btn-primary btn-sm w-100 rounded-pill" type="submit">
+                                        Tambah Keranjang
+                                    </button>
+                                </form>                                
                             </div>
                         </div>
                     </div>
@@ -132,9 +136,11 @@
                             <p class="text-muted small mb-2"><%= book.author %></p>
                             <div class="mt-auto">
                                 <p class="fw-bold text-primary mb-2">Rp <%= book.price.toLocaleString('id-ID') %></p>
-                                <button type="button" class="btn btn-primary btn-sm w-100 rounded-pill">
-                                    Tambah Keranjang
-                                </button>
+                                <form action="/cart/add/<%= book._id %>" method="POST">
+                                    <button class="btn btn-primary btn-sm w-100 rounded-pill" type="submit">
+                                        Tambah Keranjang
+                                    </button>
+                                </form>                                
                             </div>
                         </div>
                     </div>
