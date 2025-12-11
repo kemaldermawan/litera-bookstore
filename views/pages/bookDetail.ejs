@@ -53,10 +53,11 @@
                         </button>
                     <% } else { %>
                         <div class="d-flex align-items-center gap-3">
-                            <a href="/cart/add/<%= book._id %>" 
-                               class="btn btn-outline-primary rounded-pill">
-                                Add to Cart
-                            </a>
+                            <form action="/cart/add/<%= book._id %>" method="POST">
+                                <button class="btn btn-outline-primary rounded-pill">
+                                    Add to Cart
+                                </button>
+                            </form>
 
                             <form action="/checkout" method="GET" class="d-inline">
                                 <button type="submit" class="btn btn-primary rounded-pill">
