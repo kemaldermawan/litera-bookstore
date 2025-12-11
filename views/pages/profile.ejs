@@ -6,37 +6,37 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Informasi Akun</h5>
-            <p><strong>Username:</strong></p>
-            <p><strong>Email:</strong></p>
-            <p><strong>No. HP:</strong></p>
+            <p><strong>Username:</strong> <%= user.username %></p>
+            <p><strong>Email   :</strong> <%= user.email %></p>
+            <p><strong>No. HP  :</strong> <%= user.phone %></p>
 
             <hr>
-            <a href="#" class="btn btn-danger rounded-pill btn-logout">Logout</a>
+            <a href="/login" class="btn btn-danger rounded-pill btn-logout">Logout</a>
         </div>
     </div>
 
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Alamat Pengiriman Utama</h5>
-            <form action="#" method="POST">
+            <form action="/profile/update-address" method="POST">
                 <div class="mb-3">
                     <label for="street" class="form-label">Jalan</label>
-                    <input type="text" class="form-control" id="street">
+                    <input type="text" id="street" name="street" class="form-control" value="<%= user.address.street %>">
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="city" class="form-label">Kota</label>
-                        <input type="text" class="form-control" id="city">
+                        <input type="text" id="city" name="city" class="form-control" value="<%= user.address.city %>">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="province" class="form-label">Provinsi</label>
-                        <input type="text" class="form-control" id="province"">
+                        <input type="text" id="province" name="province" class="form-control" value="<%= user.address.province %>">
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="postalCode" class="form-label">Kode Pos</label>
-                        <input type="text" class="form-control" id="postalCode">
+                        <input type="text" id="postalCode" name="postalCode" class="form-control" value="<%= user.address.postalCode %>">
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary rounded-pill">Simpan Alamat</button>

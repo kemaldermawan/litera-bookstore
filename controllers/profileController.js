@@ -1,44 +1,24 @@
 const User = require('../models/User');
 
-exports.getProfile = async (req, res) => {
-    const userSession = req.session.user;
-
-    if (!userSession) return res.redirect('/login');
-
-    try {
-        const user = await User.findById(userSession.id);
-
-        res.render('pages/profile', {
-            user,
-            needUpdate: req.query.need === 'complete-profile'
-        });
-    } catch (error) {
-        console.log(error);
-        res.redirect('/');
-    }
+exports.getProfile = (req, res) => {
+    res.render('pages/profile', { user: req.session.user });
 };
 
-exports.updateProfile = async (req, res) => {
-    const userSession = req.session.user;
-    if (!userSession) return res.redirect('/login');
+exports.updateAddress = async (req, res) => {
 
-    const { phone, street, city, province, postalCode } = req.body;
+    if (!req.session.user) return res.redirect('/login');
 
-    try {
-        const user = await User.findById(userSession.id);
+    const { street, city, province, postalCode } = req.body;
 
-        user.phone = phone;
-        user.address = { street, city, province, postalCode };
+    const updatedUser = await User.findByIdAndUpdate(
+        req.session.user.id,
+        { address: { street, city, province, postalCode } },
+        { new: true }
+    );
 
-        await user.save();
+    req.session.user.address = updatedUser.address;
 
-        // perbarui session
-        req.session.user.phone = phone;
-        req.session.user.address = user.address;
-
-        res.redirect('/profile?updated=true');
-    } catch (error) {
-        console.log(error);
-        res.render('pages/profile', { error: "Gagal memperbarui profil" });
-    }
+    res.redirect('/profile');
 };
+
+
