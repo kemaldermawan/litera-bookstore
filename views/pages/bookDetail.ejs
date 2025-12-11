@@ -91,12 +91,30 @@
             <hr class="my-5">
 
             <!-- ULASAN -->
-            <h3>Ulasan Pengguna</h3>
+            <h3>Ulasan Pengguna</h3>        
 
-            <% if (book.numReviews === 0) { %>
+            <% if (reviews.length === 0) { %>
                 <p>Belum ada ulasan untuk buku ini.</p>
-            <% } %>
+            <% } else { %>
+                <% reviews.forEach(r => { %>
 
+                    <div class="review-box mb-4 p-3 border rounded">
+                        <strong><%= r.username %></strong>
+                        <br>
+                        <span class="text-warning">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <i class="bi bi-star-fill <%= i <= r.rating ? 'text-warning' : 'text-secondary' %>"></i>
+                            <% } %>
+                        </span>
+                        <p class="mt-2"><%= r.comment %></p>
+                        <small class="text-muted"><%= r.createdAt.toLocaleDateString() %></small>
+                    </div>
+                <% }) %>
+            <% } %>
+            
+            <a href="/review/<%= book._id %>" class="btn btn-outline-primary rounded-pill mb-3">
+                Tulis Ulasan
+            </a> 
         </div>
 
         <!-- RELATED BOOKS -->

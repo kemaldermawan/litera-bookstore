@@ -96,5 +96,40 @@
         });
     </script>
     
+    <script>
+        const stars = document.querySelectorAll(".star-icon");
+        const ratingInput = document.getElementById("rating-input");
+    
+        stars.forEach(star => {
+            star.addEventListener("click", () => {
+                const ratingValue = star.getAttribute("data-value");
+    
+                // Update input hidden
+                ratingInput.value = ratingValue;
+    
+                // Reset semua bintang
+                stars.forEach(s => s.classList.remove("selected"));
+    
+                // Warnai bintang sesuai rating yang dipilih
+                for (let i = 0; i < ratingValue; i++) {
+                    stars[i].classList.add("selected");
+                }
+            });
+    
+            // Hover effect (optional)
+            star.addEventListener("mouseover", () => {
+                const ratingValue = star.getAttribute("data-value");
+                stars.forEach(s => s.classList.remove("hover"));
+                for (let i = 0; i < ratingValue; i++) {
+                    stars[i].classList.add("hover");
+                }
+            });
+    
+            star.addEventListener("mouseleave", () => {
+                stars.forEach(s => s.classList.remove("hover"));
+            });
+        });
+    </script>
+    
     </body>
 </html>

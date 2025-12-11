@@ -1,4 +1,5 @@
 const Book = require('../models/Book');
+const Review = require('../models/Review');
 
 module.exports = {
     
@@ -58,6 +59,12 @@ module.exports = {
             if (!book) {
                 return res.status(404).send("Buku tidak ditemukan");
             }
+            
+            // Ambil review berdasarkan bookId
+            const reviews = await Review.find({ book: bookId })
+                .populate('user', 'username')
+                .sort({ createdAt: -1 })
+                .lean();
 
             const relatedBooks = await Book.find({
                 category: book.category,
@@ -68,6 +75,7 @@ module.exports = {
                 pageTitle: book.title,
                 book: book,
                 relatedBooks: relatedBooks,
+                reviews,
                 user: req.session.user || null 
             });
 

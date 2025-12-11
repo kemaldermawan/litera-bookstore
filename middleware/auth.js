@@ -1,9 +1,19 @@
+const User = require('../models/User');
+
 module.exports = {
     isLoggedIn(req, res, next) {
-        if (!req.session.user) return res.redirect('/login');
-        next();
-    },
-
+        try {
+            if (!req.session || !req.session.user) {
+              return res.redirect('/login');
+            }
+            req.user = req.session.user; // cukup pakai data session
+            next();
+          } catch (err) {
+            console.error('Auth middleware error', err);
+            return res.redirect('/login');
+          }
+        },
+      
     isAdmin(req, res, next) {
         if (!req.session.user || req.session.user.role !== 'admin') {
             return res.redirect('/');

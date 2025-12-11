@@ -11,7 +11,9 @@
         cursor: pointer;
         transition: color 0.2s;
     }
-    #star-rating .star-icon:hover,
+    #star-rating .star-icon:hover {
+        color: #ffd76d;
+    }
     #star-rating .star-icon.selected {
         color: #ffc107;
     }
@@ -20,9 +22,9 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-        <h3>Beri Ulasan untuk: </h3>
+        <h3>Beri Ulasan untuk: <%= book.title %></h3>
         <hr>
-        <form action="#" method="POST">
+        <form action="/review/<%= book._id %>" method="POST">
             
             <div class="mb-3">
             <label class="form-label">Rating</label>
@@ -41,7 +43,7 @@
             </div>
             
             <button type="submit" class="btn btn-primary rounded-pill">Kirim Ulasan</button>
-            <a href="#" class="btn btn-outline-primary rounded-pill">Batal</a>
+            <a href="/store/book/<%= book._id %>" class="btn btn-outline-primary rounded-pill">Batal</a>
             </form>
         </div>
     </div>

@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/User');
 
 exports.getProfile = async (req, res) => {
     const userSession = req.session.user;

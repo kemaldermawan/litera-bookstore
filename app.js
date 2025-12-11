@@ -8,6 +8,7 @@ const MongoStore = require("connect-mongo");
 const bookRoutes = require("./routes/bookRoutes");
 const adminBookRoutes = require('./routes/adminBooks');
 const cartRoutes = require('./routes/cartRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 dotenv.config();
 connectDB();
@@ -40,13 +41,16 @@ app.use((req, res, next) => {
 // Gunakan bookRoutes untuk halaman utama
 app.use("/", bookRoutes);
 app.use('/admin/books', adminBookRoutes);
+app.use('/', reviewRoutes);
 app.use('/', require('./routes/auth'));
 app.use('/profile', require('./routes/profile'));
 app.use('/checkout', require('./routes/checkout'));
 app.use(cartRoutes);
 
+
 // Route statis lainnya (bisa dipindahkan ke controller nanti)
 app.get("/profile", (req, res) => res.render("pages/profile"));
+app.get("/orderSuccess", (req, res) => res.render("pages/orderSuccess"));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
