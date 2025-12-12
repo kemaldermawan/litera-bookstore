@@ -15,32 +15,191 @@
             <div class="card-body p-4">
                 <h2 class="card-title text-center mb-4">Register Akun Baru</h2>
                 
-                <form action="#" method="POST">
+                <form action="/register" method="POST" id="registerForm">
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
+                    <input type="text" class="form-control" id="username" name="username" required value="<%= typeof username !== 'undefined' ? username : '' %>">
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
+                    <input type="email" class="form-control" id="email" name="email" required value="<%= typeof email !== 'undefined' ? email : '' %>">
                 </div>
 
                 <div class="mb-3">
                     <label for="phone" class="form-label">No. HP</label>
                     <input type="tel" class="form-control" id="phone" name="phone" required>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 position-relative">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="password" 
+                            name="password" 
+                            required
+                        >
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                            👁
+                        </button>
+                    </div>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 position-relative">
                     <label for="password2" class="form-label">Konfirmasi Password</label>
-                    <input type="password" class="form-control" id="password2" name="password2" required>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="password2" 
+                            name="password2" 
+                            required
+                        >
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword2">
+                            👁
+                        </button>
+                    </div>
+
+                    <span id="passInfo" class="password-info d-none" data-tooltip="sandi tidak cocok">i</span>
                 </div>
                 <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-primary rounded-pill">Register</button>
+                    <button type="submit" class="btn btn-primary rounded-pill" id="registerBtn" disabled>Register</button>
                 </div>
                 </form>
+                <% if (typeof error !== "undefined") { %>
+                    <div id="popup-alert" class="popup-alert shake">
+                        <%= error %>
+                    </div>
+                <% } %>
+                 </div>
+                    <style>
+                        .shake {
+                            animation: shake 0.4s ease-in-out;
+                        }
+
+                        @keyframes shake {
+                            0% { transform: translateX(0); }
+                            25% { transform: translateX(-5px); }
+                            50% { transform: translateX(5px); }
+                            75% { transform: translateX(-5px); }
+                            100% { transform: translateX(0); }
+                        }
+
+                        .popup-alert {
+                            position: fixed;
+                            top: 20px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: #e74c3c;
+                            color: white;
+                            padding: 12px 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                            font-weight: 600;
+                            z-index: 9999;
+                            opacity: 0;
+                            animation: fadeInOut 3s ease forwards;
+                        }
+
+                        @keyframes fadeInOut {
+                            0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+                            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                            80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                            100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+                        }
+                    </style>
+                    <style>
+                        .password-info {
+                            position: absolute;
+                            right: 12px;
+                            top: 72px;
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 50%;
+                            background: #e74c3c;
+                            color: #fff;
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 12px;
+                            font-weight: 700;
+                            cursor: pointer;
+                            z-index: 1050;
+                        }
+
+                        .password-info::after {
+                            content: attr(data-tooltip);
+                            position: absolute;
+                            right: 28px;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            background: rgba(0,0,0,0.8);
+                            color: #fff;
+                            padding: 6px 8px;
+                            border-radius: 4px;
+                            white-space: nowrap;
+                            font-size: 12px;
+                            opacity: 0;
+                            pointer-events: none;
+                            transition: opacity 0.15s ease;
+                        }
+
+                        .password-info:hover::after {
+                            opacity: 1;
+                        }
+                    </style>
+                <script>
+                document.getElementById("togglePassword").addEventListener("click", function () {
+                    const pass = document.getElementById("password");
+                    pass.type = pass.type === "password" ? "text" : "password";
+                });
+
+                document.getElementById("togglePassword2").addEventListener("click", function () {
+                    const pass2 = document.getElementById("password2");
+                    pass2.type = pass2.type === "password" ? "text" : "password";
+                });
+
+
+                (function () {
+                    const pass = document.getElementById('password');
+                    const pass2 = document.getElementById('password2');
+                    const btn = document.getElementById('registerBtn');
+                    const form = document.getElementById('registerForm');
+                    const info = document.getElementById('passInfo');
+
+                    function validate() {
+                        const v1 = pass.value.trim();
+                        const v2 = pass2.value.trim();
+                        if (v1.length > 0 && v1 === v2) {
+                            btn.disabled = false;
+                            pass.classList.remove('is-invalid');
+                            pass2.classList.remove('is-invalid');
+                            if (info) info.classList.add('d-none');
+                        } else {
+                            btn.disabled = true;
+                            if (v2.length > 0) {
+                                pass.classList.add('is-invalid');
+                                pass2.classList.add('is-invalid');
+                                if (info) info.classList.remove('d-none');
+                            } else {
+                                pass.classList.remove('is-invalid');
+                                pass2.classList.remove('is-invalid');
+                                if (info) info.classList.add('d-none');
+                            }
+                        }
+                    }
+
+                    pass.addEventListener('input', validate);
+                    pass2.addEventListener('input', validate);
+
+
+                    form.addEventListener('submit', function (e) {
+                        if (pass.value.trim() !== pass2.value.trim()) {
+                            e.preventDefault();
+                            validate();
+                        }
+                    });
+                })();
+                </script>
                 
                 <p class="mt-3 text-center">
                 Sudah punya akun? <a href="/login">Login di sini</a>
