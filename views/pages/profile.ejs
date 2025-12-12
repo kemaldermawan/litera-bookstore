@@ -2,16 +2,67 @@
 
 <div class="container mt-4">
     <h1 class="mb-4">Profil Saya</h1>
+
+    <% if (typeof success !== "undefined" && success) { %>
+        <div id="popup-alert" class="popup-alert" style="background: #27ae60;">
+            <%= success %>
+        </div>
+        <style>
+            .popup-alert {
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #27ae60;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                font-weight: 600;
+                z-index: 9999;
+                opacity: 0;
+                animation: fadeInOut 3s ease forwards;
+            }
+
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+                10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+            }
+        </style>
+        <script>
+            setTimeout(() => {
+                const p = document.getElementById('popup-alert');
+                if (p) p.remove();
+            }, 3200);
+        </script>
+    <% } %>
     
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title">Informasi Akun</h5>
+            <div class="text-center mb-4">
+                <img src="<%= user.profilePicture %>" alt="Profile Picture" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #ddd;">
+            </div>
+
+            <h5 class="card-title text-center mb-4">Informasi Akun</h5>
             <p><strong>Username:</strong> <%= user.username %></p>
             <p><strong>Email   :</strong> <%= user.email %></p>
             <p><strong>No. HP  :</strong> <%= user.phone || '-' %></p>
             
+            <% if (user.bio) { %>
+                <p><strong>Bio:</strong></p>
+                <p class="text-muted"><%= user.bio %></p>
+            <% } %>
+            
             <hr>
-            <a href="/login" class="btn btn-danger rounded-pill btn-logout">Logout</a>
+            <div class="d-flex gap-2">
+                <a href="/profile/edit" class="btn btn-primary rounded-pill">Edit Profil</a>
+                <a href="/logout" class="btn btn-danger rounded-pill btn-logout">Logout</a>
+                <button type="button" class="btn btn-outline-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    Hapus Akun
+                </button>
+            </div>
         </div>
     </div>
 
@@ -120,6 +171,29 @@
         </div>
     <% } %>
 
+</div>
+
+<!-- Modal Konfirmasi Hapus Akun -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteAccountLabel">Hapus Akun</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Perhatian!</strong></p>
+                <p>Anda akan menghapus akun secara permanen. Tindakan ini tidak dapat dibatalkan dan semua data akun Anda akan hilang.</p>
+                <p class="text-muted">Apakah Anda yakin ingin melanjutkan?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <form action="/profile/delete-account" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Ya, Hapus Akun</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <%- include('../partials/footer') %>
