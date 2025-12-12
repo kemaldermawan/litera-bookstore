@@ -16,20 +16,88 @@
             <div class="card-body p-4">
                 <h2 class="card-title text-center mb-4">Login</h2>
                 
-                <form action="/login" method="POST">
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <div class="mb-3">
+                    <form action="/login" method="POST" id="loginForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required value="<%= typeof email !== 'undefined' ? email : '' %>">
+                        </div>
+                <div class="mb-3 position-relative">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            class="form-control" 
+                            id="password" 
+                            name="password" 
+                            required
+                        >
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                            👁
+                        </button>
+                    </div>
                 </div>
+                <script>
+                document.getElementById("togglePassword").addEventListener("click", function () {
+                    const pass = document.getElementById("password");
+                    pass.type = pass.type === "password" ? "text" : "password";
+                });
+                </script>
                 <div class="d-grid mt-4">
                     <button type="submit" class="btn btn-primary rounded-pill">Login</button>
                 </div>
                 </form>
-                
+                <% if (typeof error !== "undefined") { %>
+                    <div id="popup-alert" class="popup-alert shake">
+                        <%= error %>
+                    </div>
+                <% } %>
+                <% if (typeof deleted !== "undefined" && deleted === 'true') { %>
+                    <div id="popup-alert" class="popup-alert" style="background: #27ae60;">
+                        Akun Anda telah dihapus. Silakan buat akun baru atau login ke akun lama untuk melanjutkan.
+                    </div>
+                <% } %>
+                <% if (typeof loggedOut !== "undefined" && loggedOut === 'true') { %>
+                    <div id="popup-alert" class="popup-alert" style="background: #27ae60;">
+                        Berhasil logout! Sampai jumpa lagi👋😊
+                    </div>
+                <% } %>
+                 </div>
+                    <style>
+                        .popup-alert {
+                            position: fixed;
+                            top: 20px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: #e74c3c;
+                            color: white;
+                            padding: 12px 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                            font-weight: 600;
+                            z-index: 9999;
+                            opacity: 0;
+                            animation: fadeInOut 5s ease forwards;
+                        }
+
+                        @keyframes fadeInOut {
+                            0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+                            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                            80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                            100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+                        }
+                    </style>
+                    <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        const form = document.getElementById('loginForm');
+
+                        if (form.classList.contains("shake")) {
+                            setTimeout(() => {
+                                form.classList.remove("shake");
+                            }, 500);
+                        }
+                    });
+                    </script>
+
                 <p class="mt-3 text-center">
                 Belum punya akun? <a href="/register">Register di sini</a>
                 </p>
