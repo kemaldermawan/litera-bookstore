@@ -156,4 +156,41 @@
 
 </div>
 
+<% if (typeof success !== 'undefined' && success) { %>
+    <div id="popup-alert" class="popup-alert" style="background: #27ae60;">
+        <%= success %>
+    </div>
+    <style>
+        .popup-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #27ae60;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-weight: 600;
+            z-index: 9999;
+            opacity: 0;
+            animation: fadeInOut 3s ease forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+        }
+    </style>
+    <script>
+        // Ensure popup element is removed after animation in case CSS doesn't hide it
+        setTimeout(() => {
+            const p = document.getElementById('popup-alert');
+            if (p) p.remove();
+        }, 3200);
+    </script>
+<% } %>
+
 <%- include('../partials/footer') %>
