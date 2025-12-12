@@ -4,12 +4,14 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <h1 class="display-4">Pesanan Diproses!</h1>
-            <p class="lead">Terima kasih. Pesanan Anda sedang diproses (Status: Pending).</p>
+            <p class="lead">Terima kasih. Pesanan Anda sedang diproses (Status: <%= order.status %>).</p>
             <hr>
-                <h4>Detail Pesanan</h4>
-                <p><strong>Nomor Order:</strong></p>
-                <p><strong>Total Pembayaran:</strong>Rp</p>
-                <p><strong>Metode Pembayaran:</strong></p>
+            <h4>Detail Pesanan</h4>
+
+            <p><strong>Nomor Order:</strong> <%= order._id %></p>
+            <p><strong>Total Pembayaran:</strong> Rp <%= order.totalPrice.toLocaleString() %></p>
+            <p><strong>Metode Pembayaran:</strong> <%= order.paymentMethod %></p>
+
             <a href="/" class="btn btn-primary mt-4 rounded-pill text-white">Kembali ke Toko</a>
         </div>
     </div>

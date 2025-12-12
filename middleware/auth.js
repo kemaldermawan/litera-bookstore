@@ -8,6 +8,7 @@ module.exports = {
             }
             req.user = req.session.user; // cukup pakai data session
             next();
+
           } catch (err) {
             console.error('Auth middleware error', err);
             return res.redirect('/login');
@@ -20,7 +21,7 @@ module.exports = {
         }
         next();
     },
-
+    
     mustCompleteProfile(req, res, next) {
         const user = req.session.user;
         if (!user) return res.redirect('/login');

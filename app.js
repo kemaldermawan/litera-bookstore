@@ -10,6 +10,8 @@ const adminBookRoutes = require('./routes/adminBooks');
 const cartRoutes = require('./routes/cartRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const checkoutRoutes = require("./routes/checkoutRoutes");
+const orderRoutes = require('./routes/orderRoutes');
 
 dotenv.config();
 connectDB();
@@ -44,11 +46,11 @@ app.use("/", bookRoutes);
 app.use('/admin/books', adminBookRoutes);
 app.use('/', reviewRoutes);
 app.use('/', require('./routes/auth'));
+app.use("/", require("./routes/orderRoutes"));
 app.use('/profile', profileRoutes);
-app.use('/checkout', require('./routes/checkout'));
-app.use(cartRoutes);
-
-app.get("/orderSuccess", (req, res) => res.render("pages/orderSuccess"));
+app.use("/", checkoutRoutes);
+app.use("/", orderRoutes);
+app.use("/", cartRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

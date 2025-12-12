@@ -2,96 +2,129 @@
 
 <div class="container mt-5">
     <div class="row g-5">
-        
+
+        <!-- LEFT SIDE -->
         <div class="col-md-7">
-        <h2 class="mb-4">Detail Checkout</h2>
-        
-        <form action="/checkout" method="POST" id="checkoutForm">
-            
-            <input type="hidden" name="isBuyNow">
-            
-            <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body p-4">
-                <h5 class="card-title">Alamat Pengiriman</h5>
-                <p class="mb-1"><strong></strong></p>
-                <p class="text-muted mb-1">
-                </p>
-                <a href="/profile" class="small text-decoration-none">Ubah Alamat di Profil</a>
-                <p class="text-danger">Alamat atau No. HP Anda belum lengkap.</p>
-                <a href="/profile" class="btn btn-sm btn-primary rounded-pill">Isi Alamat & No. HP di Profil</a>
-            </div>
-            </div>
+            <h2 class="mb-4">Detail Checkout</h2>
 
-            <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
-                <h5 class="card-title mb-3">Metode Pembayaran</h5>
-                <div class="form-check">
-                <input class="form-check-input" type="radio" name="paymentMethod" id="payCOD" value="COD" checked>
-                <label class="form-check-label" for="payCOD">
-                    Cash on Delivery (COD)
-                </label>
-                </div>
-                <div class="form-check">
-                <input class="form-check-input" type="radio" name="paymentMethod" id="payTransfer" value="Bank Transfer">
-                <label class="form-check-label" for="payTransfer">
-                    Bank Transfer
-                </label>
-                </div>
-                <div class="form-check">
-                <input class="form-check-input" type="radio" name="paymentMethod" id="payEwallet" value="E-Wallet">
-                <label class="form-check-label" for="payEwallet">
-                    E-Wallet (OVO/GoPay)
-                </label>
-                </div>
-            </div>
-            </div>
+            <form action="/checkout" method="POST" id="checkoutForm">
 
-            <div class="d-grid gap-2 d-md-none mt-4">
-            <button type="submit" class="btn btn-primary btn-lg rounded-pill">Buat Pesanan</button>
-            </div>
-        </form>
-        </div>
+                <!-- Hidden input untuk Buy Now -->
+                <% if (isBuyNow) { %>
+                    <input type="hidden" name="isBuyNow" value="true">
+                    <input type="hidden" name="bookId" value="<%= items[0].id %>">
+                <% } else { %>
+                    <input type="hidden" name="isBuyNow" value="false">
+                <% } %>
 
-        <div class="col-md-5">
-        <div class="card shadow-sm border-0 position-sticky" style="top: 100px;">
-            <div class="card-body p-4">
-            
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title mb-0">Pesanan Anda</h5>
-                <a href="/cart" class="small text-decoration-none">Edit Keranjang</a>
-            </div>
-            <ul class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
-                <li class="list-group-item d-flex align-items-center px-0">
-                    <img src="#" style="width: 50px; height: 75px; object-fit: cover; border-radius: 4px;" class="me-3">
-                    <div class="me-auto">
-                    <div class="fw-bold"></div>
-                    <small class="text-muted"></small>
+                <!-- ADDRESS CARD -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title">Alamat Pengiriman</h5>
+
+                        <% const emptyAddress = !user.address || !user.address.city || !user.phone; %>
+
+                        <% if (emptyAddress) { %>
+                            <p class="text-danger">Alamat atau No. HP belum lengkap.</p>
+                            <a href="/profile" class="btn btn-sm btn-primary rounded-pill">Lengkapi Profil</a>
+                        <% } else { %>
+                            <p class="mb-1"><strong><%= user.username %></strong></p>
+                            <p class="text-muted mb-1">
+                                <%= user.address.street %>,
+                                <%= user.address.city %>,
+                                <%= user.address.province %> -
+                                <%= user.address.postalCode %>
+                            </p>
+                            <a href="/profile" class="small text-decoration-none">Ubah Alamat</a>
+                        <% } %>
                     </div>
-                    <span class="fw-bold">Rp</span>
-                </li>
-            </ul>
+                </div>
 
-            <ul class="list-group list-group-flush summary-list mt-3">
-                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                Subtotal
-                <strong>Rp</strong>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                Biaya Pengiriman
-                <span class="text-success">Gratis</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center px-0 fs-5 fw-bold border-top pt-3">
-                Total
-                <strong>Rp</strong>
-                </li>
-            </ul>
+                <!-- PAYMENT -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3">Metode Pembayaran</h5>
 
-            <div class="d-grid mt-4 d-none d-md-block">
-                <button type="submit" form="checkoutForm" class="btn btn-primary btn-lg rounded-pill">Buat Pesanan</button>
-                <a href="/orderSuccess" class="stretched-link"></a>
-            </div>
-            </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" value="COD" checked>
+                            <label class="form-check-label">Cash on Delivery (COD)</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" value="Bank Transfer">
+                            <label class="form-check-label">Bank Transfer</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" value="E-Wallet">
+                            <label class="form-check-label">E-Wallet</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-none mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill">Buat Pesanan</button>
+                </div>
+
+            </form>
         </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 position-sticky" style="top: 100px;">
+                <div class="card-body p-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Pesanan Anda</h5>
+                        <% if (!isBuyNow) { %>
+                            <a href="/cart" class="small text-decoration-none">Edit Keranjang</a>
+                        <% } %>
+                    </div>
+
+                    <!-- ITEMS LIST -->
+                    <ul class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
+                        <% items.forEach(item => { %>
+                            <li class="list-group-item d-flex align-items-center px-0">
+                                <img src="<%= item.coverImage %>" 
+                                    style="width: 50px; height: 75px; object-fit: cover; border-radius: 4px;" 
+                                    class="me-3">
+
+                                <div class="me-auto">
+                                    <div class="fw-bold"><%= item.title %></div>
+                                    <small class="text-muted">Qty: <%= item.quantity %></small>
+                                </div>
+
+                                <span class="fw-bold">Rp <%= item.price.toLocaleString('id-ID') %></span>
+                            </li>
+                        <% }) %>
+                    </ul>
+
+                    <!-- SUMMARY -->
+                    <ul class="list-group list-group-flush summary-list mt-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Subtotal
+                            <strong>Rp <%= subtotal.toLocaleString('id-ID') %></strong>
+                        </li>
+
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Biaya Pengiriman
+                            <span class="text-success">Gratis</span>
+                        </li>
+
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 fs-5 fw-bold border-top pt-3">
+                            Total
+                            <strong>Rp <%= subtotal.toLocaleString('id-ID') %></strong>
+                        </li>
+                    </ul>
+
+                    <div class="d-grid mt-4 d-none d-md-block">
+                        <button type="submit" form="checkoutForm" class="btn btn-primary btn-lg rounded-pill">
+                            Buat Pesanan
+                        </button>
+                    </div>
+
+                </div>
+            </div>
         </div>
 
     </div>
