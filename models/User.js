@@ -21,7 +21,10 @@ const UserSchema = new mongoose.Schema({
         city: { type: String, default: '' },
         province: { type: String, default: '' },
         postalCode: { type: String, default: '' }
-    }
+    },
+
+    bio: { type: String, default: '' },
+    profilePicture: { type: String, default: '/img/default-profile.jpg' }
 }, { timestamps: true });
 
 UserSchema.pre('save', async function(next) {
