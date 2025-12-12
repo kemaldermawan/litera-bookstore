@@ -34,38 +34,50 @@ exports.buyNow = async (req, res) => {
     }
 };
 
-exports.checkoutCart = async (req, res) => {
-    const cart = await Cart.findOne({ user: req.session.user.id })
-        .populate("items.book");
+// checkoutController.js
 
-    if (!cart || cart.items.length === 0) {
-        return res.redirect("/cart");
+exports.checkoutCart = async (req, res) => {
+    // GANTI: Ambil dari Sesi, bukan MongoDB. (Seperti yang dilakukan cartController.js)
+    const sessionCart = req.session.cart || [];
+
+    if (sessionCart.length === 0) {
+        return res.redirect("/cart"); // Keranjang sesi kosong
     }
 
-    const checkoutItems = cart.items.map(item => ({
-        id: item.book._id,
-        title: item.book.title,
-        price: item.book.price,
-        quantity: item.quantity,
-        coverImage: item.book.coverImage 
+    // Karena item di sesi sudah berisi data lengkap (title, price, dll),
+    // kita tidak perlu populate, kita hanya memetakan strukturnya.
+
+    const checkoutItems = sessionCart.map(item => ({
+        id: item.bookId, // bookId dari sesi menjadi id untuk checkout.ejs
+        title: item.title,
+        price: item.price,
+        quantity: item.qty, // qty dari sesi menjadi quantity untuk checkout.ejs
+        coverImage: item.coverImage 
     }));
 
     const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // Periksa untuk memastikan variabel `user` ada sebelum merender
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
 
     return res.render("pages/checkout", {
         user: req.session.user,
         isBuyNow: false,
         items: checkoutItems,
-        subtotal: total
+        subtotal: subtotal
     });
-    
 };
 
+// checkoutController.js
+
 exports.createOrder = async (req, res) => {
-    const { paymentMethod, isBuyNow } = req.body;
+    const { paymentMethod, isBuyNow, bookId } = req.body;
     const user = req.session.user;
 
-    if (!user.address || !user.address.city) {
+    // Periksa user dan address (Wajib Lolos Middleware)
+    if (!user || !user.id || !user.address || !user.address.city || !user.phone) {
         return res.redirect("/profile?need=complete-profile");
     }
 
@@ -73,7 +85,10 @@ exports.createOrder = async (req, res) => {
     let totalPrice = 0;
 
     if (isBuyNow === "true") {
-        const book = await Book.findById(req.body.bookId);
+        // --- LOGIC UNTUK BUY NOW ---
+        const book = await Book.findById(bookId);
+        if (!book) return res.redirect("/");
+
         items.push({
             book: book._id,
             quantity: 1,
@@ -82,30 +97,70 @@ exports.createOrder = async (req, res) => {
         totalPrice = book.price;
 
     } else {
-        const cart = await Cart.findOne({ user: user.id }).populate("items.book");
-        items = cart.items.map(item => ({
-            book: item.book._id,
-            quantity: item.quantity,
-            priceAtPurchase: item.book.price
+        // --- LOGIC UNTUK CHECKOUT DARI CART SESSION ---
+        const sessionCart = req.session.cart || [];
+
+        if (sessionCart.length === 0) {
+            return res.redirect("/cart?error=empty-cart");
+        }
+        
+        items = sessionCart.map(item => ({
+            book: item.bookId,
+            quantity: item.qty,
+            priceAtPurchase: item.price
         }));
+        
         totalPrice = items.reduce((sum, i) => sum + i.priceAtPurchase * i.quantity, 0);
 
-        await Cart.findOneAndDelete({ user: user.id });
+        // **PENTING: Jangan hapus keranjang sesi di sini dulu, kita butuh datanya untuk update salesCount**
+        // req.session.cart = []; // Kita pindahkan ini ke bawah
+    }
+    
+    if (totalPrice <= 0) {
+        return res.redirect("/cart?error=zero-price"); 
     }
 
+    // ==========================================================
+    // 🔥🔥 BAGIAN BARU: UPDATE SALES COUNT 🔥🔥
+    // ==========================================================
+
+    const bulkUpdateOperations = items.map(item => ({
+        updateOne: {
+            filter: { _id: item.book },
+            // $inc digunakan untuk menaikkan nilai field yang ada
+            update: { $inc: { salesCount: item.quantity } } 
+            // Kita naikkan salesCount sejumlah quantity buku yang dibeli
+        }
+    }));
+
+    // Gunakan Book.bulkWrite untuk update semua buku dalam satu operasi batch
+    if (bulkUpdateOperations.length > 0) {
+        await Book.bulkWrite(bulkUpdateOperations);
+    }
+    
+    // ==========================================================
+    // 🔥🔥 END OF UPDATE SALES COUNT 🔥🔥
+    // ==========================================================
+
+    // Jika order berhasil, baru hapus keranjang sesi
+    if (isBuyNow !== "true") {
+         req.session.cart = [];
+    }
+
+    // Buat Order baru dengan semua field REQUIRED
     const newOrder = await Order.create({
         user: user.id,
         items,
         totalPrice,
         paymentMethod,
         shippingAddress: {
-            ...user.address,
+            street: user.address.street,
+            city: user.address.city,
+            province: user.address.province,
+            postalCode: user.address.postalCode,
             phone: user.phone
         }
     });
 
-    // 🔥 ARAHKAN KE /order-success/:orderId
     res.redirect(`/order-success/${newOrder._id}`);
 };
-
-
