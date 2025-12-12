@@ -18,6 +18,10 @@ router.post('/update/:id', upload, adminBookController.updateBook);
 // Delete
 router.post('/delete/:id', adminBookController.deleteBook);
 
+// ROUTE DATA DINAMIS (Dipanggil oleh AJAX/Fetch API)
+router.get('/data/transactions', adminBookController.getTransactions);
+router.get('/data/reviews', adminBookController.getReviews);
+
 module.exports = router;
 
 

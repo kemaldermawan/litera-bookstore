@@ -1,12 +1,25 @@
 const Book = require('../models/Book');
 const path = require('path');
+const Order = require("../models/Order");
+const Review = require("../models/Review");
+const User = require('../models/User'); // Pastikan User model diimpor untuk populate
 
 module.exports = {
 
-    // Dashboard
+    // -----------------------------------------------------
+    // A. FUNGSI UTAMA (Manajemen Buku)
+    // -----------------------------------------------------
+
+    // Dashboard - Menampilkan daftar buku dan halaman admin utama
     getDashboard: async (req, res) => {
-        const books = await Book.find().lean();
-        res.render('admin/dashboard', { books });
+        try {
+            const books = await Book.find().lean();
+            // Asumsi file EJS Anda ada di views/admin/dashboard.ejs
+            res.render('admin/dashboard', { books });
+        } catch (err) {
+            console.error("Error loading dashboard:", err);
+            res.status(500).send("Gagal memuat dashboard.");
+        }
     },
 
     // Form edit
@@ -57,7 +70,6 @@ module.exports = {
                 category: kategori,
             };
 
-            // kalau user upload cover baru
             if (req.file) {
                 updatedData.coverImage = "/img/covers/" + req.file.filename;
             }
@@ -75,6 +87,40 @@ module.exports = {
     deleteBook: async (req, res) => {
         await Book.findByIdAndDelete(req.params.id);
         res.redirect('/admin/books');
+    },
+
+    // -----------------------------------------------------
+    // B. FUNGSI DATA DINAMIS (Untuk AJAX)
+    // -----------------------------------------------------
+
+    // 1. Ambil data Transaksi
+    getTransactions: async (req, res) => {
+        try {
+            const transactions = await Order.find({})
+                .populate('user', 'username') // Mengambil username
+                .sort({ createdAt: -1 });
+
+            // Mengirim data sebagai JSON untuk diolah JS di frontend
+            res.json({ success: true, transactions });
+        } catch (error) {
+            console.error("Error fetching transactions:", error);
+            res.status(500).json({ success: false, message: "Gagal memuat data transaksi." });
+        }
+    },
+
+    // 2. Ambil data Review
+    getReviews: async (req, res) => {
+        try {
+            const reviews = await Review.find({})
+                .populate('user', 'username') // Mengambil username
+                .populate('book', 'title') // Mengambil judul buku
+                .sort({ createdAt: -1 });
+
+            // Mengirim data sebagai JSON untuk diolah JS di frontend
+            res.json({ success: true, reviews });
+        } catch (error) {
+            console.error("Error fetching reviews:", error);
+            res.status(500).json({ success: false, message: "Gagal memuat data review." });
+        }
     }
 };
-
