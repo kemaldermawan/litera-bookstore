@@ -24,6 +24,12 @@ module.exports = {
                 Book.find({ category: { $regex: 'Biografi|Biography', $options: 'i' } }).limit(5).lean()
             ]);
 
+            // Ambil pesan sukses dari session (jika ada) lalu hapus dari session
+            const success = req.session ? req.session.success : null;
+            console.log('DEBUG: session.success before delete =', req.session ? req.session.success : undefined);
+            if (req.session) delete req.session.success;
+            console.log('DEBUG: captured success =', success);
+
             res.render('pages/home', {
                 pageTitle: 'Litera Bookstore',
                 newArrivals,
@@ -33,7 +39,8 @@ module.exports = {
                 scifi,
                 mystery,
                 biography,
-                user: req.session.user || null 
+                user: req.session.user || null,
+                success: success || null
             });
 
         } catch (err) {
