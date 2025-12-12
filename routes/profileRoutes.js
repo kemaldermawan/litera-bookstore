@@ -1,199 +1,62 @@
-<%- include('../partials/navbar') %>
+const express = require('express');
+const router = express.Router();
+const profileController = require('../controllers/profileController');
+const { isLoggedIn } = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
-<div class="container mt-4">
-    <h1 class="mb-4">Profil Saya</h1>
+// Multer configuration untuk profile picture
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const dest = 'public/img/profiles/';
+        try {
+            fs.mkdirSync(dest, { recursive: true });
+        } catch (err) {
+            return cb(err);
+        }
+        cb(null, dest);
+    },
+    filename: function (req, file, cb) {
+        cb(null, 'profile-' + req.session.user.id + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
 
-    <% if (typeof success !== "undefined" && success) { %>
-        <div id="popup-alert" class="popup-alert" style="background: #27ae60;">
-            <%= success %>
-        </div>
-        <style>
-            .popup-alert {
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: #27ae60;
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-                font-weight: 600;
-                z-index: 9999;
-                opacity: 0;
-                animation: fadeInOut 3s ease forwards;
-            }
+const fileFilter = (req, file, cb) => {
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (allowedMimes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('File harus berupa gambar (JPG, PNG, GIF)'), false);
+    }
+};
 
-            @keyframes fadeInOut {
-                0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-                10% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                80% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-            }
-        </style>
-        <script>
-            setTimeout(() => {
-                const p = document.getElementById('popup-alert');
-                if (p) p.remove();
-            }, 3200);
-        </script>
-    <% } %>
-    
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="text-center mb-4">
-                <img src="<%= user.profilePicture %>" alt="Profile Picture" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #ddd;">
-            </div>
+const upload = multer({ 
+    storage: storage, 
+    fileFilter: fileFilter,
+    limits: { fileSize: 2 * 1024 * 1024 } // 2MB max
+});
 
-            <h5 class="card-title text-center mb-4">Informasi Akun</h5>
-            <p><strong>Username:</strong> <%= user.username %></p>
-            <p><strong>Email   :</strong> <%= user.email %></p>
-            <p><strong>No. HP  :</strong> <%= user.phone || '-' %></p>
-            
-            <% if (user.bio) { %>
-                <p><strong>Bio:</strong></p>
-                <p class="text-muted"><%= user.bio %></p>
-            <% } %>
-            
-            <hr>
-            <div class="d-flex gap-2">
-                <a href="/profile/edit" class="btn btn-primary rounded-pill">Edit Profil</a>
-                <a href="/logout" class="btn btn-danger rounded-pill btn-logout">Logout</a>
-                <button type="button" class="btn btn-outline-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                    Hapus Akun
-                </button>
-            </div>
-        </div>
-    </div>
+router.get('/', isLoggedIn, profileController.getProfile);
+router.post('/update-address', isLoggedIn, profileController.updateAddress);
+router.post('/delete-account', isLoggedIn, profileController.deleteAccount);
+router.get('/edit', isLoggedIn, profileController.getEditProfile);
+// Multer wrapper to handle errors and render edit page on failure
+const uploadProfileMiddleware = (req, res, next) => {
+    upload.single('profilePicture')(req, res, function(err) {
+        if (err) {
+            // Multer error (file too large, invalid mime, etc.)
+            const errorMessage = err.code === 'LIMIT_FILE_SIZE' ? 'Ukuran gambar terlalu besar (Max 2MB)' : (err.message || 'Gagal upload file');
+            // Fetch fresh user data and render edit page with error
+            const User = require('../models/User');
+            return User.findById(req.session.user.id).lean()
+                .then(user => res.render('pages/edit-profile', { user: user, error: errorMessage }))
+                .catch(() => res.render('pages/edit-profile', { user: req.session.user, error: errorMessage }));
+        }
+        next();
+    });
+};
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Alamat Pengiriman Utama</h5>
-            <form action="/profile/update-address" method="POST">
-                <div class="mb-3">
-                    <label for="street" class="form-label">Jalan</label>
-                    <input type="text" id="street" name="street" class="form-control" value="<%= user.address ? user.address.street || '' : '' %>">
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="city" class="form-label">Kota</label>
-                        <input type="text" id="city" name="city" class="form-control" value="<%= user.address ? user.address.city || '' : '' %>">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="province" class="form-label">Provinsi</label>
-                        <input type="text" id="province" name="province" class="form-control" value="<%= user.address ? user.address.province || '' : '' %>">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="postalCode" class="form-label">Kode Pos</label>
-                        <input type="text" id="postalCode" name="postalCode" class="form-control" value="<%= user.address ? user.address.postalCode || '' : '' %>">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary rounded-pill">Simpan Alamat</button>
-            </form>
-        </div>
-    </div>
+router.post('/edit', isLoggedIn, uploadProfileMiddleware, profileController.postEditProfile);
 
-    <h3 class="mb-3">Riwayat Transaksi</h3>
-
-    <% if (orders && orders.length > 0) { %>
-        <% orders.forEach(order => { %>
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header d-flex flex-wrap justify-content-between">
-                    <div>
-                        <strong>Pesanan ID:</strong> <small class="text-muted"><%= order._id %></small>
-                    </div>
-                    <div>
-                        <strong>Tanggal:</strong> 
-                        <%= new Date(order.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %>
-                    </div>
-                </div>
-                
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        
-                        <% order.items.forEach(item => { %>
-                            <li class="list-group-item d-flex align-items-center py-3">
-                                
-                                <% if (item.book) { %>
-                                    <img src="<%= item.book.coverImage %>" alt="<%= item.book.title %>" style="width: 50px; height: 75px; object-fit: cover; margin-right: 15px;">
-                                    
-                                    <div class="me-auto">
-                                        <strong><%= item.book.title %></strong>
-                                        <br>
-                                        <small class="text-muted">Qty: <%= item.quantity %>, Harga Satuan: Rp <%= item.priceAtPurchase.toLocaleString('id-ID') %></small>
-                                    </div>
-                                    
-                                    <div class="ms-3 text-end">
-                                        <% 
-                                            // Asumsi: Status order disetel 'Selesai' di backend
-                                            const canReview = order.status === 'Selesai' || !order.status; 
-                                            // TODO: Tambahkan logika cek apakah item ini sudah diulas
-                                            const isReviewed = false; // Ganti dengan logika sebenarnya
-                                        %>
-                                        
-                                        <% if (isReviewed) { %>
-                                            <button class="btn btn-sm btn-success rounded-pill" disabled>Sudah Diulas</button>
-                                        <% } else if (canReview) { %>
-                                            <a href="/review/new/<%= item.book._id %>" class="btn btn-sm btn-primary rounded-pill text-white">
-                                                Tulis Ulasan
-                                            </a>
-                                        <% } %>
-                                    </div>
-                                <% } else { %>
-                                    <div class="text-danger">Item tidak valid atau buku telah dihapus.</div>
-                                <% } %>
-                            </li>
-                        <% }) %>
-                    </ul>
-                </div>
-
-                <div class="card-footer d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>Status:</strong>
-                        <% 
-                            const status = 'Selesai'; 
-                            let statusClass = 'bg-secondary';
-                            if (status === 'Selesai') statusClass = 'bg-success';
-                            else if (status === 'Dibatalkan') statusClass = 'bg-danger';
-                            else if (status === 'Pending' || status === 'Baru') statusClass = 'bg-warning text-dark';
-                        %>
-                        <span class="badge <%= statusClass %>"><%= status %></span>
-                    </div>
-                    <h5 class="mb-0">Total: <span class="text-primary fw-bold">Rp <%= order.totalPrice.toLocaleString('id-ID') %></span></h5>
-                </div>
-            </div>
-        <% }) %>
-    <% } else { %>
-        <div class="alert alert-info text-center">
-            Anda belum memiliki riwayat transaksi. Ayo mulai berbelanja!
-        </div>
-    <% } %>
-
-</div>
-
-<!-- Modal Konfirmasi Hapus Akun -->
-<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteAccountLabel">Hapus Akun</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p><strong>Perhatian!</strong></p>
-                <p>Anda akan menghapus akun secara permanen. Tindakan ini tidak dapat dibatalkan dan semua data akun Anda akan hilang.</p>
-                <p class="text-muted">Apakah Anda yakin ingin melanjutkan?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <form action="/profile/delete-account" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Ya, Hapus Akun</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<%- include('../partials/footer') %>
+module.exports = router;
