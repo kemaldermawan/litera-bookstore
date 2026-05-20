@@ -1,0 +1,119 @@
+<%- include('../partials/navbar') %>
+
+<div class="container edit-profile-infrastructure" style="margin-top: 24px; padding-bottom: 48px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            
+            <div class="border-bottom pb-2 mb-4">
+                <h2 class="fw-bold text-dark mb-1">Edit Profile</h2>
+                <p class="text-muted mb-0">Update your account information, personal bio, and billing or shipping address</p>
+            </div>
+
+            <div class="card shadow-sm border-0 p-4 bg-white rounded-3">
+                <div class="card-body">
+                    
+                    <form action="/auth/profile/edit" method="POST" enctype="multipart/form-data" id="editProfileForm">
+  
+                        <div class="mb-4 text-center bg-light p-4 rounded border border-dashed">
+                            <label class="form-label fw-bold text-dark d-block mb-3">Profile Picture</label>
+                            <div class="mb-3 position-relative d-inline-block mx-auto">
+                               <img src="<%= user.profilePicture || '/img/default-avatar.png' %>" alt="Avatar preview" id="previewImage" class="rounded-circle img-thumbnail shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                            </div>
+                            <div class="mx-auto" style="max-width: 350px;">
+                                <input type="file" class="form-control form-control-sm rounded-pill" id="profilePicture" name="profilePicture" accept="image/*">
+                                <small class="text-muted d-block mt-2 font-sm">Accepted file types: JPG, JPEG, or PNG (Max size: 2MB)</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="bio" class="form-label fw-bold text-dark small">Biography</label>
+                            <textarea class="form-control small-placeholder" id="bio" name="bio" rows="4" maxlength="200" placeholder="Tell us a little bit about yourself, your favorite genres, or reading preferences..." style="resize: none;"><%= user.bio || '' %></textarea>
+                            <div class="text-end text-muted font-sm mt-1">
+                                <span id="charCount">0</span> / 200 characters
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3 pt-2 border-bottom pb-2">
+                            <i class="bi bi-truck me-2 text-primary"></i>Shipping Address
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label fw-bold text-secondary small">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="<%= user.phone || '' %>" required placeholder="e.g., 081234567890">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="street" class="form-label fw-bold text-secondary small">Street Address</label>
+                            <input type="text" class="form-control" id="street" name="address[street]" value="<%= (user.address && user.address.street) ? user.address.street : '' %>" required placeholder="e.g., Jl. Rawamangun Muka No. 1">
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                               <label for="city" class="form-label fw-bold text-secondary small">City</label>
+                                <input type="text" class="form-control" id="city" name="address[city]" value="<%= (user.address && user.address.city) ? user.address.city : '' %>" required placeholder="e.g., Jakarta Timur">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="postalCode" class="form-label fw-bold text-secondary small">Postal Code</label>
+                                <input type="text" class="form-control" id="postalCode" name="address[postalCode]" value="<%= (user.address && user.address.postalCode) ? user.address.postalCode : '' %>" required placeholder="e.g., 13220">
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-end g-3 border-top pt-4">
+                            <div class="col-auto">
+                                <a href="/auth/profile" class="btn btn-outline-secondary btn-sm fw-semibold rounded-pill px-4 py-2">
+                                    Cancel
+                                </a>
+                            </div>
+                            <div class="col-auto">
+                               <button type="submit" class="btn btn-primary btn-sm fw-semibold rounded-pill px-5 py-2 text-white shadow-sm">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInputNode = document.getElementById('profilePicture');
+        const previewImageNode = document.getElementById('previewImage');
+        const bioTextareaNode = document.getElementById('bio');
+        const charCountDisplay = document.getElementById('charCount');
+
+        if (fileInputNode && previewImageNode) {
+            fileInputNode.addEventListener('change', function(e) {
+                const targetedFile = e.target.files[0];
+                if (targetedFile) {
+                    const localReaderNode = new FileReader();
+                    localReaderNode.onload = function(event) {
+                        previewImageNode.src = event.target.result;
+                    };
+                    localReaderNode.readAsDataURL(targetedFile);
+                }
+            });
+        }
+
+        if (bioTextareaNode && charCountDisplay) {
+            charCountDisplay.textContent = bioTextareaNode.value.length;
+            bioTextareaNode.addEventListener('input', function() {
+                charCountDisplay.textContent = this.value.length;
+            });
+        }
+    });
+</script>
+
+<style>
+    .font-sm { font-size: 0.75rem; }
+    .small-placeholder::placeholder { font-size: 0.85rem; color: #adb5bd; }
+    .edit-profile-infrastructure { min-height: 80vh; }
+    .border-dashed { border-style: dashed !important; border-width: 2px !important; border-color: #dee2e6 !important; }
+</style>
+
+<%- include('../partials/footer') %>

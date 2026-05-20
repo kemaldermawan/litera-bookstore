@@ -11,7 +11,8 @@ const BookSchema = new Schema({
     category: { 
         type: String, 
         required: true,
-        enum: ['Fiksi', 'Non-Fiksi', 'Komik', 'Biografi', 'Anak-Anak', 'Edukasi']
+        // List genre baru yang sudah disempurnakan dan saling melengkapi
+        enum: ['Fiction', 'Non-Fiction', 'Technology & Science', 'Comic & Graphic Novel', 'Biography & History', 'Children & Young Adult', 'Textbook & Education']
     },
     salesCount: { type: Number, default: 0 },
     averageRating: { type: Number, default: 0 },
@@ -19,4 +20,4 @@ const BookSchema = new Schema({
     reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }]
 }, { timestamps: true });
 
-module.exports = mongoose.model('Book', BookSchema);
+module.exports = mongoose.models.Book || mongoose.model('Book', BookSchema);

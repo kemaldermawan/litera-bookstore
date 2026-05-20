@@ -1,60 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Litera Bookstore</title>
-    
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <link rel="stylesheet" href="/css/style.css">
-
-    <style>
-        .nav-tabs .nav-link.active {
-            background-color: #ff9900 !important; 
-            color: black !important; 
-            border-color: #ff9900 !important; 
-        }
-
-        .nav-tabs .nav-link:hover:not(.active) {
-            border-color: #ff9900 #ff9900 #dee2e6; 
-        }
-
-        .nav-tabs .nav-link {
-            color: #000000 !important;
-        }
-    </style>
-</head>
-<body>
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top border-bottom shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-danger border-3 shadow fixed-top">
     <div class="container-fluid px-4">
-      
-      <a class="navbar-brand" href="/">
-        <img src="/img/logo.png" alt="logo" width="100">
-      </a>
-      
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <form class="d-flex mx-auto w-50" action="#" method="GET">
-          <input class="form-control me-2 rounded-pill" type="search" name="query" placeholder="Cari judul, penulis, atau kategori..." aria-label="Search">
-          <button class="btn btn-primary rounded-pill" type="submit" aria-label="Cari">
-            <i class="bi bi-search"></i>
-          </button>
-        </form>
+        <a class="navbar-brand fw-bold text-danger text-uppercase d-flex align-items-center letter-spacing-1" href="/admin/dashboard">
+            <i class="bi bi-shield-fill-check text-danger me-2"></i>Litera Admin Suite
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminControlNavbarContent" aria-controls="adminControlNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <ul class="navbar-nav ms-auto d-flex flex-row align-items-center">
-          <li class="nav-item me-3">
-            <a class="nav-link" href="/login" title="Login">
-              <i class="bi bi-box-arrow-in-right fs-4"></i>
-            </a>
-          </li>
-        </ul>
-      </div>
+        <div class="collapse navbar-collapse" id="adminControlNavbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active fw-semibold text-white d-flex align-items-center" href="/admin/dashboard">
+                        <i class="bi bi-grid-1x2-fill me-1.5 text-danger"></i>Main Dashboard
+                    </a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a class="nav-link text-light opacity-75 d-flex align-items-center" href="/store" target="_blank">
+                        <i class="bi bi-globe me-1"></i>View Storefront <i class="bi bi-box-arrow-up-right small ms-1"></i>
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                <% if ((typeof currentUser !== 'undefined' && currentUser) || (typeof user !== 'undefined' && user)) { 
+                    const adminActive = typeof currentUser !== 'undefined' && currentUser ? currentUser : user;
+                %>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle bg-secondary bg-opacity-25 border border-secondary border-opacity-50 rounded-pill px-3 d-flex align-items-center text-white" href="#" id="adminProfileSecureDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="<%= adminActive.profilePicture || '/img/default-avatar.png' %>" alt="Operator Avatar" class="rounded-circle me-2 border border-danger border-2" style="width: 28px; height: 28px; object-fit: cover;">
+                            <span class="fw-semibold small"><%= adminActive.username || 'System Admin' %></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2" aria-labelledby="adminProfileSecureDropdown" style="min-width: 220px; z-index: 2000;">
+                            <li class="p-3 py-2 bg-light rounded-top border-bottom">
+                                <div class="vstack">
+                                    <span class="text-muted d-block small" style="font-size: 0.75rem;">Access Role: Admin</span>
+                                    <strong class="text-dark text-truncate d-block small" style="max-width: 180px;"><%= adminActive.email %></strong>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center py-2" href="/auth/profile">
+                                    <i class="bi bi-person-bounding-box me-2 text-muted"></i>My Profile
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item text-danger fw-bold d-flex align-items-center py-2" href="/auth/logout">
+                                    <i class="bi bi-power me-2"></i>Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a class="btn btn-sm btn-outline-danger px-3 rounded-pill fw-bold" href="/auth/login">Login Admin</a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
     </div>
 </nav>
+
+<div style="margin-top: 76px;"></div>

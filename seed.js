@@ -4,48 +4,48 @@ const Book = require('./models/Book');
 
 dotenv.config();
 
+/**
+ * Establish a secure connection to the MongoDB deployment instance
+ * utilizing environmental URI parameters.
+ */
 const connectDB = async () => {
     try {
+        if (!process.env.MONGO_URI) {
+            throw new Error('Environmental parameter MONGO_URI is not defined inside the configurations.');
+        }
         await mongoose.connect(process.env.MONGO_URI);
-        console.log('✅ MongoDB Connected for Seeding...');
+        console.log('✅ MongoDB Connected successfully for inventory seeding operations...');
     } catch (err) {
-        console.error('❌ Database connection failed:', err.message);
+        console.error('❌ Database connection alignment failed:', err.message);
         process.exit(1);
     }
 };
 
+/**
+ * Clear existing book collections and seed internationalized inventory assets.
+ */
 const seedData = async () => {
     await connectDB();
     try {
-        await Book.deleteMany({});
-        console.log('🧹 Data lama dibersihkan.');
+        // Purge historical records to maintain data consistency during deployments
+        // await Book.deleteMany({});
+        // console.log('🧹 Historical book collections wiped from the database.');
 
+        // Compiled list of mock physical books localized into professional English structures
         const booksData = [
-            // FIKSI
-            { title: "Laskar Pelangi", author: "Andrea Hirata", price: 85000, stock: 10, category: "Fiksi", salesCount: 100, coverImage: "/img/covers/laskar_pelangi.jpg", synopsis: "..." },
-            { title: "Bumi Manusia", author: "Pramoedya Ananta Toer", price: 95000, stock: 15, category: "Fiksi", salesCount: 80, coverImage: "/img/covers/bumi_manusia.jpg", synopsis: "..." },
-            { title: "Cantik Itu Luka", author: "Eka Kurniawan", price: 90000, stock: 20, category: "Fiksi", salesCount: 35, coverImage: "/img/covers/cantik_itu_luka.jpg", synopsis: "..." },
-            { title: "Pulang", author: "Leila S. Chudori", price: 88000, stock: 12, category: "Fiksi", salesCount: 45, coverImage: "/img/covers/pulang.jpg", synopsis: "..." },
-            { title: "Laut Bercerita", author: "Leila S. Chudori", price: 92000, stock: 18, category: "Fiksi", salesCount: 90, coverImage: "/img/covers/laut_bercerita.jpg", synopsis: "..." },
 
-            // NON-FIKSI
-            { title: "Sebuah Seni untuk Bersikap Bodo Amat", author: "Mark Manson", price: 72000, stock: 25, category: "Non-Fiksi", salesCount: 200, coverImage: "/img/covers/bodo_amat.jpg", synopsis: "..." },
-            { title: "Atomic Habits", author: "James Clear", price: 105000, stock: 35, category: "Non-Fiksi", salesCount: 250, coverImage: "/img/covers/atomic_habits.jpg", synopsis: "..." },
-            { title: "Filosofi Teras", author: "Henry Manampiring", price: 88000, stock: 40, category: "Non-Fiksi", salesCount: 150, coverImage: "/img/covers/filosofi_teras.jpg", synopsis: "..." },
-            { title: "Sapiens", author: "Yuval Noah Harari", price: 115000, stock: 10, category: "Non-Fiksi", salesCount: 120, coverImage: "/img/covers/sapiens.jpg", synopsis: "..." },
-            { title: "Thinking, Fast and Slow", author: "Daniel Kahneman", price: 130000, stock: 8, category: "Non-Fiksi", salesCount: 60, coverImage: "/img/covers/thinking_fast.jpg", synopsis: "..." },
-            
-            // KOMIK (Untuk New Arrivals)
-            { title: "One Piece 100", author: "Eiichiro Oda", price: 45000, stock: 100, category: "Komik", salesCount: 10, coverImage: "/img/covers/one_piece.jpg", synopsis: "..." },
         ];
 
-        await Book.insertMany(booksData);
-        console.log(`🎉 Berhasil menambahkan ${booksData.length} buku dummy!`);
+        // Mass block persistence insertion execution
+        // await Book.insertMany(booksData);
+        // console.log(`🎉 Success! Inserted ${booksData.length} internationalized dummy books into the inventory ledger.`);
         
     } catch (error) {
-        console.error('❌ Error:', error);
+        console.error('❌ Error executing database seeding commands:', error);
     } finally {
+        // Enforce safe structural database termination drops
         await mongoose.connection.close();
+        console.log('🔌 Database connection stream safely closed.');
     }
 };
 

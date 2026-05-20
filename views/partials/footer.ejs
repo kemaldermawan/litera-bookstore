@@ -1,135 +1,112 @@
-<footer class="bg-dark text-light mt-5 pt-5 pb-3 mt-200">
-        <div class="container">
-            <div class="row">
+<footer class="bg-dark text-light py-5 mt-auto border-top border-secondary border-opacity-25" style="font-size: 0.9rem;">
+    <div class="container-fluid px-4">
+        <div class="row g-4">
             
-            <div class="col-md-4 mb-4">
-                <h5>Litera</h5> <p class="text-white-50">
-                Misi kami adalah menyediakan koleksi buku terlengkap dari seluruh dunia
-                untuk para pembaca di Indonesia, dengan pelayanan yang cepat dan harga
-                yang terjangkau.
+            <div class="col-md-4 mb-3">
+                <h5 class="fw-bold text-primary text-uppercase letter-spacing-1 mb-3">Litera</h5>
+                <p class="text-white-50 lh-relaxed">
+                    Our mission is to provide the most comprehensive collection of literary works from around the globe to readers in Indonesia, backed by swift operations and competitive retail pricing benchmarks.
                 </p>
             </div>
             
-            <div class="col-md-2 mb-4">
-                <h5>Kategori</h5>
-                <ul class="list-unstyled">
-                <li><a href="#" class="text-white-50 text-decoration-none">Fiction</a></li>
-                <li><a href="#" class="text-white-50 text-decoration-none">Non-Fiction</a></li>
-                <li><a href="#" class="text-white-50 text-decoration-none">Sci-Fi & Fantasy</a></li>
-                <li><a href="#" class="text-white-50 text-decoration-none">Mystery & Thriller</a></li>
-                <li><a href="#" class="text-white-50 text-decoration-none">Biography</a></li>
-                </ul>
+            <div class="col-md-3 mb-3 ms-auto">
+                <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+                    <h5 class="fw-bold text-warning mb-3"><i class="bi bi-shield-lock me-2"></i>Database Controls</h5>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li><a href="/admin/dashboard" class="text-white-50 text-decoration-none custom-footer-link small"><i class="bi bi-speedometer2 me-1"></i>Admin Control Panel</a></li>
+                        <li><a href="/admin/books" class="text-white-50 text-decoration-none custom-footer-link small"><i class="bi bi-journal-plus me-1"></i>Manage Book Inventory</a></li>
+                        <li><a href="/admin/orders" class="text-white-50 text-decoration-none custom-footer-link small"><i class="bi bi-receipt me-1"></i>Customer Order Registry</a></li>
+                        <li><a href="/admin/reviews" class="text-white-50 text-decoration-none custom-footer-link small"><i class="bi bi-chat-left-quote me-1"></i>Review Moderation Pipeline</a></li>
+                    </ul>
+                <% } else { %>
+                    <h5 class="fw-bold text-light mb-3">Store Collections</h5>
+                    <ul class="list-unstyled d-flex flex-column gap-2">
+                        <li><a href="/search?q=Fiction" class="text-white-50 text-decoration-none custom-footer-link small">Fiction Masterpieces</a></li>
+                        <li><a href="/search?q=Non-Fiction" class="text-white-50 text-decoration-none custom-footer-link small">Non-Fiction & Philosophy</a></li>
+                        <li><a href="/search?q=Technology" class="text-white-50 text-decoration-none custom-footer-link small">Technology & Science</a></li>
+                        <li><a href="/search?q=Comic" class="text-white-50 text-decoration-none custom-footer-link small">Comics & Graphic Novels</a></li>
+                    </ul>
+                <% } %>
             </div>
-            
-            <div class="col-md-3 mb-4">
-                <h5>Bantuan & Akun</h5>
-                <ul class="list-unstyled">
-                    <li><a href="/profile" class="text-white-50 text-decoration-none">Profil Saya</a></li>
-                    <li><a href="/cart" class="text-white-50 text-decoration-none">Keranjang</a></li>
-                    <li><a href="/login" class="text-white-50 text-decoration-none">Login</a></li>
-                    <li><a href="/register" class="text-white-50 text-decoration-none">Register</a></li>
+
+            <div class="col-md-3 mb-3">
+                <h5 class="fw-bold text-light mb-3">Account Framework</h5>
+                <ul class="list-unstyled d-flex flex-column gap-2">
+                    
+                    <% if (typeof user !== 'undefined' && user) { %>
+                        <% if (user.role === 'admin') { %>
+                            <li><a href="/auth/profile" class="text-white-50 text-decoration-none custom-footer-link small"></i>Admin Profile Console</a></li>
+                            <li><a href="/auth/profile/edit" class="text-white-50 text-decoration-none custom-footer-link small"></i>System Preferences</a></li>
+                            <li><a href="/auth/logout" class="text-danger-emphasis text-decoration-none custom-footer-link small fw-semibold"></i>Terminate System Session</a></li>
+                        <% } else if (user.role === 'user') { %>
+                            <li><a href="/auth/profile" class="text-white-50 text-decoration-none custom-footer-link small">My Account Profile</a></li>
+                            <li><a href="/cart" class="text-white-50 text-decoration-none custom-footer-link small">My Shopping Cart</a></li>
+                            <li><a href="/orders/history" class="text-white-50 text-decoration-none custom-footer-link small">Historical Invoice Tracking</a></li>
+                            <li><a href="/auth/logout" class="text-white-50 text-decoration-none custom-footer-link small">Sign Out</a></li>
+                        <% } %>
+                    <% } else { %>
+                        <li><a href="/auth/login" class="text-white-50 text-decoration-none custom-footer-link small"></i>Sign In</a></li>
+                        <li><a href="/auth/register" class="text-white-50 text-decoration-none custom-footer-link small"></i>New Account</a></li>
+                        <li><a href="/store" class="text-white-50 text-decoration-none custom-footer-link small">Catalog</a></li>
+                    <% } %>
+                    
                 </ul>
             </div>
 
-            <div class="col-md-3 mb-4">
-                <h5>Hubungi Kami</h5>
-                <ul class="list-unstyled text-white-50 small">
-                <li>Email: support@litera.com</li> <li>Telepon: (021) 123-4567</li>
-                </ul>
-            </div>
-            
-            </div>
-            
-            <hr class="text-white-50">
-            <div class="row">
-            <div class="col text-center">
-                <p class="text-white-50 small">&copy; 2025 Litera Project. All Rights Reserved.</p>
-            </div>
+        </div>
+
+        <hr class="my-4 border-secondary border-opacity-50">
+        <div class="row">
+            <div class="col-12 text-center">
+                <p class="text-white-50 small mb-2">&copy; 2026 Litera Bookstore. All Rights Reserved.</p>
             </div>
         </div>
-    </footer>
+    </div>
+</footer>
 
-    <script src="/js/bootstrap.bundle.min.js"></script>
-    
-    <script src="/js/main.js"></script>
-    <script>
-        function formatRupiah(number) {
-            return number.toLocaleString('id-ID');
-        }
-    
-        const qtyInputs = document.querySelectorAll('.cart-qty');
-    
-        qtyInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                const parent = this.closest('.cart-item-row');
-                const priceElement = parent.querySelector('.total-price');
-                const price = parseInt(priceElement.dataset.price);
-                const qty = parseInt(this.value) || 0;
-    
-                // Update total per-item
-                priceElement.innerText = "Rp " + formatRupiah(price * qty);
-            });
-        });
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-        function updateSummary() {
-            let subtotal = 0;
-            document.querySelectorAll('.total-price').forEach(item => {
-                const number = parseInt(item.innerText.replace(/\D/g, '')) || 0;
-                subtotal += number;
-            });
+<script>
+    const interactiveRatingStars = document.querySelectorAll(".review-rating-star-node");
+    const hiddenRatingPayloadInput = document.getElementById("reviewRatingSecurePayload");
 
-            document.getElementById('subtotal').innerText = "Rp " + formatRupiah(subtotal);
-            document.getElementById('total').innerText = "Rp " + formatRupiah(subtotal); // free shipping
-        }
-
-        qtyInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                const parent = this.closest('.cart-item-row');
-                const priceElement = parent.querySelector('.total-price');
-                const price = parseInt(priceElement.dataset.price);
-                const qty = parseInt(this.value) || 0;
-
-                priceElement.innerText = "Rp " + formatRupiah(price * qty);
-
-                updateSummary();
-            });
-        });
-    </script>
-    
-    <script>
-        const stars = document.querySelectorAll(".star-icon");
-        const ratingInput = document.getElementById("rating-input");
-    
-        stars.forEach(star => {
+    if (interactiveRatingStars && interactiveRatingStars.length > 0) {
+        interactiveRatingStars.forEach(star => {
             star.addEventListener("click", () => {
-                const ratingValue = star.getAttribute("data-value");
-    
-                // Update input hidden
-                ratingInput.value = ratingValue;
-    
-                // Reset semua bintang
-                stars.forEach(s => s.classList.remove("selected"));
-    
-                // Warnai bintang sesuai rating yang dipilih
-                for (let i = 0; i < ratingValue; i++) {
-                    stars[i].classList.add("selected");
+                const targetRatingValue = parseInt(star.getAttribute("data-value")) || 0;
+                if (hiddenRatingPayloadInput) {
+                    hiddenRatingPayloadInput.value = targetRatingValue;
+                }
+                interactiveRatingStars.forEach(s => s.classList.remove("selected"));
+                for (let i = 0; i < targetRatingValue; i++) {
+                    interactiveRatingStars[i].classList.add("selected");
                 }
             });
-    
-            // Hover effect (optional)
+
             star.addEventListener("mouseover", () => {
-                const ratingValue = star.getAttribute("data-value");
-                stars.forEach(s => s.classList.remove("hover"));
-                for (let i = 0; i < ratingValue; i++) {
-                    stars[i].classList.add("hover");
+                const hoverRatingThreshold = parseInt(star.getAttribute("data-value")) || 0;
+                interactiveRatingStars.forEach(s => s.classList.remove("hover"));
+                for (let i = 0; i < hoverRatingThreshold; i++) {
+                    interactiveRatingStars[i].classList.add("hover");
                 }
             });
-    
             star.addEventListener("mouseleave", () => {
-                stars.forEach(s => s.classList.remove("hover"));
+                interactiveRatingStars.forEach(s => s.classList.remove("hover"));
             });
         });
-    </script>
-    
-    </body>
-</html>
+    }
+</script>
+
+<style>
+    .custom-footer-link {
+        transition: color 0.2s ease-in-out, padding-left 0.2s ease-in-out;
+        display: inline-block;
+    }
+    .custom-footer-link:hover {
+        color: #0d6efd !important;
+        padding-left: 4px;
+    }
+    .letter-spacing-1 {
+        letter-spacing: 1px;
+    }
+</style>

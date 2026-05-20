@@ -1,38 +1,211 @@
-<%- include('../partials/navbar') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Litera Bookstore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .search-container {
+            min-height: 60vh;
+        }
+        .book-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .book-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
+        }
+        .font-sm {
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
 
-<div class="container my-5">
-    <h2 class="mb-4">Hasil Pencarian: "<%= keyword %>"</h2>
+    <%- include('../partials/navbar') %>
 
-    <% if (books.length === 0) { %>
-        <p>Tidak ada buku ditemukan.</p>
-    <% } else { %>
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
-            <% books.forEach(book => { %>
-                <div class="col">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <a href="/store/book/<%= book._id %>">
-                            <img src="<%= book.coverImage %>" class="card-img-top" style="height: 350px; object-fit: cover;">
-                        </a>
-
-                        <div class="card-body">
-                            <h6 class="fw-bold text-truncate"><%= book.title %></h6>
-                            <p class="text-muted small mb-2"><%= book.author %></p>
-                            <p class="fw-bold text-primary">Rp <%= book.price.toLocaleString('id-ID') %></p>
-                        </div>
-
-                        <div class="text-center pb-3"> 
-                            <form action="/cart/add/<%= book._id %>" method="POST" class="d-inline-block">
-                                <button class="btn btn-primary btn-sm rounded-pill px-4" type="submit">
-                                    Tambah Keranjang
-                                </button>
-                            </form>     
-                        </div>
-
-                    </div>
-                </div>
-            <% }) %>
+    <div class="container mb-5 search-infrastructure-anchor" style="margin-top: 24px;">
+        
+        <div class="d-flex flex-column mb-4 border-bottom pb-3">
+            <h2 class="fw-bold text-dark mb-1">Search Results</h2>
+            <p class="text-muted mb-0">
+                Showing results for query: <span class="text-primary fw-semibold fst-italic">"<%= query %>"</span> 
+                (<%= books.length %> books found)
+            </p>
         </div>
-    <% } %>
-</div>
 
-<%- include('../partials/footer') %>
+        <% if (!books || books.length === 0) { %>
+            <div class="text-center py-5 my-4 bg-white rounded-3 border p-5 shadow-sm animate-fade-in">
+                <div class="display-1 text-muted mb-3"><i class="bi bi-search-heart"></i></div>
+                <h4 class="fw-bold text-dark mb-2">No Matching Books Found</h4>
+                <p class="text-secondary mx-auto mb-0" style="max-width: 500px;">
+                    We couldn't find any structural records matching your keyword. Please verify your spelling or try searching for alternative genres or author names.
+                </p>
+            </div>
+        <% } else { %>
+            
+            <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4 animate-fade-in">
+                <% books.forEach(book => { %>
+                    <div class="col d-flex align-items-stretch">
+                        <div class="card w-100 shadow-sm border-0 book-card-transition p-2 bg-white rounded-3 d-flex flex-column justify-content-between">
+                            
+                            <div class="position-relative text-center bg-light rounded p-3 mb-2" style="height: 220px; display: flex; align-items: center; justify-content: center;">
+                                <img src="<%= book.coverImage %>" class="img-fluid rounded shadow-sm" style="max-height: 180px; object-fit: contain;" alt="<%= book.title %>">
+                                <% if (book.stock === 0) { %>
+                                    <div class="position-absolute top-50 start-50 translate-middle bg-danger bg-opacity-90 text-white fw-bold px-3 py-1 small rounded-pill shadow-sm font-sm">
+                                        OUT OF STOCK
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <div class="card-body p-2 d-flex flex-column justify-content-between flex-grow-1">
+                                <div class="mb-2">
+                                    <h6 class="card-title fw-bold text-dark text-truncate mb-1" title="<%= book.title %>"><%= book.title %></h6>
+                                    <p class="card-text text-muted font-sm text-truncate mb-1">By <%= book.author %></p>
+                                    
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <div class="text-warning font-sm d-flex align-items-center">
+                                            <% 
+                                                const currentRatingValue = typeof book.averageRating !== 'undefined' && book.averageRating ? book.averageRating : 0;
+                                                for (let i = 1; i <= 5; i++) { 
+                                            %>
+                                                <i class="bi <%= i <= Math.round(currentRatingValue) ? 'bi-star-fill' : 'bi-star' %> me-0.5"></i>
+                                            <% } %>
+                                            <span class="text-dark fw-semibold ms-1" style="font-size: 0.7rem;"><%= currentRatingValue > 0 ? currentRatingValue.toFixed(1) : '0.0' %></span>
+                                        </div>
+                                        <div class="text-muted border-start ps-2" style="font-size: 0.7rem;">
+                                            <span><%= typeof book.salesCount !== 'undefined' && book.salesCount ? book.salesCount : 0 %> sold</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h6 class="text-danger fw-bold mb-3">Rp <%= book.price.toLocaleString('id-ID') %></h6>
+                                    
+                                    <% if (typeof user !== 'undefined' && user && user.role === 'user') { %>
+                                        <div class="row g-2">
+                                            <div class="col-12">
+                                                <a href="/store/book/<%= book._id %>" class="btn btn-outline-primary btn-sm fw-semibold rounded-pill w-100 py-1.5 font-sm">View Details</a>
+                                            </div>
+                                            <div class="col-12">
+                                                <form action="/cart/add/<%= book._id %>" method="POST" class="ajax-cart-form">
+                                                    <button type="submit" class="btn btn-primary btn-sm fw-semibold rounded-pill w-100 py-1.5 text-white font-sm" <%= book.stock === 0 ? 'disabled' : '' %>>
+                                                        <i class="bi bi-cart-plus me-1"></i>Add To Cart
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="d-grid">
+                                            <a href="/store/book/<%= book._id %>" class="btn btn-outline-primary btn-sm fw-semibold rounded-pill py-1.5 font-sm">View Details</a>
+                                        </div>
+                                    <% } %>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+
+        <% } %>
+    </div>
+
+    <div id="runtime-popup-alert" class="popup-alert-node" style="display: none;"></div>
+
+    <script>
+        function showToastAlert(textMessage) {
+            const toastNode = document.getElementById('runtime-popup-alert');
+            if (toastNode) {
+                toastNode.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>${textMessage}`;
+                toastNode.style.display = 'block';
+                setTimeout(() => {
+                    toastNode.style.display = 'none';
+                }, 3500);
+            }
+        }
+
+        // AJAX HANDLING: Menambahkan item ke keranjang tanpa perlu memuat ulang atau berpindah halaman
+        document.addEventListener("DOMContentLoaded", () => {
+            const cartForms = document.querySelectorAll('.ajax-cart-form');
+            
+            cartForms.forEach(form => {
+                form.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    
+                    const targetUrl = form.getAttribute('action');
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    const originalButtonHtml = submitButton.innerHTML;
+                    
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Adding...';
+                    
+                    try {
+                        const response = await fetch(targetUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        const result = await response.json();
+                        if (response.ok && result.success) {
+                            const cartBadge = document.querySelector('.navbar .badge');
+                            if (cartBadge) {
+                                cartBadge.textContent = result.cartCount;
+                            }
+                            showToastAlert(result.message);
+                        } else {
+                            alert(result.error || 'Failed to add item to cart.');
+                        }
+                    } catch (error) {
+                        console.error('AJAX Search-Cart operational failure:', error);
+                        alert('Network error. Failed to communicate with server.');
+                    } finally {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalButtonHtml;
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .search-infrastructure-anchor { min-height: 75vh; }
+        .font-sm { font-size: 0.75rem; }
+        .book-card-transition { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+        .book-card-transition:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important; }
+        .animate-fade-in { animation: runFadeIn 0.4s ease-out forwards; }
+        
+        .popup-alert-node {
+            position: fixed;
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #27ae60;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            font-weight: 600;
+            z-index: 1050;
+        }
+
+        @keyframes runFadeIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+    </style>
+
+    <%- include('../partials/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

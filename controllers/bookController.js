@@ -1,124 +1,127 @@
 const Book = require('../models/Book');
 const Review = require('../models/Review');
+const Order = require('../models/Order');
 
-module.exports = {
-    
-    // 1. Fungsi untuk Halaman Utama (Homepage)
-    getAllBooks: async (req, res) => {
-        try {
-            // Mengambil data secara paralel untuk efisiensi
-            const [newArrivals, bestsellers, fiction, nonFiction, scifi, mystery, biography] = await Promise.all([
-                
-                // New Arrivals: Ambil semua buku, urutkan dari yang terbaru
-                Book.find({}).sort({ createdAt: -1 }).limit(5).lean(),
-                
-                // Bestsellers: Ambil buku yang sudah terjual
-                Book.find({ salesCount: { $gt: 0 } }).sort({ salesCount: -1 }).limit(5).lean(),
+/**
+ * Fetch and aggregate book collections for the main bookstore storefront.
+ */
+exports.getAllBooks = async (req, res) => {
+    try {
+        const [newArrivals, bestsellers, fiction, nonFiction, technology, comic, biography] = await Promise.all([
+            Book.find({}).sort({ createdAt: -1 }).limit(5).lean(),
+            Book.find({ salesCount: { $gt: 0 } }).sort({ salesCount: -1 }).limit(5).lean(),
+            Book.find({ genre: { $regex: '^Fiction$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ genre: { $regex: '^Non-Fiction$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ genre: { $regex: '^Technology & Science$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ genre: { $regex: '^Comic & Graphic Novel$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ genre: { $regex: '^Biography & History$', $options: 'i' } }).limit(5).lean()
+        ]);
 
-                // Kategori Spesifik (Menggunakan Regex agar case-insensitive)
-                // Contoh: Mencari 'Fiksi' akan cocok dengan 'fiksi', 'FIKSI', 'Literary & General Fiction', dll.
-                Book.find({ category: { $regex: 'Fiksi|Fiction', $options: 'i' } }).limit(5).lean(),
-                Book.find({ category: { $regex: 'Non-Fiksi|Non-Fiction', $options: 'i' } }).limit(5).lean(),
-                Book.find({ category: { $regex: 'Sci-Fi|Fantasi|Fantasy', $options: 'i' } }).limit(5).lean(),
-                Book.find({ category: { $regex: 'Misteri|Mystery|Thriller', $options: 'i' } }).limit(5).lean(),
-                Book.find({ category: { $regex: 'Biografi|Biography', $options: 'i' } }).limit(5).lean()
-            ]);
-
-            // Ambil pesan sukses dari session (jika ada) lalu hapus dari session
-            const success = req.session ? req.session.success : null;
-            console.log('DEBUG: session.success before delete =', req.session ? req.session.success : undefined);
-            if (req.session) delete req.session.success;
-            console.log('DEBUG: captured success =', success);
-
-            res.render('pages/home', {
-                pageTitle: 'Litera Bookstore',
-                newArrivals,
-                bestsellers,
-                fiction,
-                nonFiction,
-                scifi,
-                mystery,
-                biography,
-                user: req.session.user || null,
-                success: success || null
-            });
-
-        } catch (err) {
-            console.error("Error getting books:", err);
-            // Render halaman kosong jika error agar server tidak crash
-            res.render('pages/home', { 
-                pageTitle: 'Litera Bookstore',
-                newArrivals: [], bestsellers: [], fiction: [], 
-                nonFiction: [], scifi: [], mystery: [], biography: [],
-                user: null
-            });
+        const success = req.session ? req.session.success : null;
+        if (req.session && req.session.success) {
+            delete req.session.success;
         }
-    },
 
-    // 2. Fungsi untuk Halaman Detail Buku
-    getBookDetail: async (req, res) => {
-        try {
-            const bookId = req.params.id;
-            
-            // Cari buku berdasarkan ID
-            const book = await Book.findById(bookId).lean();
+        const error = req.query.error || null;
 
-            if (!book) {
-                return res.status(404).send("Buku tidak ditemukan");
-            }
-            
-            // Ambil review berdasarkan bookId
-            const reviews = await Review.find({ book: bookId })
-                .populate('user', 'username')
-                .sort({ createdAt: -1 })
-                .lean();
-
-            const relatedBooks = await Book.find({
-                category: book.category,
-                _id: { $ne: book._id } 
-            }).limit(4).lean();
-
-            res.render('pages/bookDetail', { 
-                pageTitle: book.title,
-                book: book,
-                relatedBooks: relatedBooks,
-                reviews,
-                user: req.session.user || null 
-            });
-
-        } catch (err) {
-            console.error("Error getting book detail:", err);
-            res.redirect('/store');
-        }
-    },
-
-    searchBooks: async (req, res) => {
-        try {
-            const q = req.query.q;
-    
-            if (!q) {
-                return res.redirect('/');
-            }
-    
-            const books = await Book.find({
-                $or: [
-                    { title: { $regex: q, $options: 'i' } },
-                    { author: { $regex: q, $options: 'i' } },
-                    { category: { $regex: q, $options: 'i' } }
-                ]
-            }).lean();
-    
-            res.render('pages/searchResult', {
-                pageTitle: `Hasil pencarian: ${q}`,
-                books,
-                keyword: q,
-                user: req.session.user || null
-            });
-    
-        } catch (err) {
-            console.error("Error search:", err);
-            res.redirect('/');
-        }
-    },    
+        res.render('pages/home', {
+            pageTitle: 'Litera Bookstore - Home',
+            newArrivals,
+            bestsellers,
+            fiction,
+            nonFiction,
+            technology,
+            comic,
+            biography,
+            success,
+            error
+        });
+    } catch (err) {
+        console.error('Critical catalogue aggregation failure:', err);
+        res.status(500).send('Internal Server Error loading catalog records.');
+    }
 };
 
+/**
+ * Retrieve detailed profiles for a specific book asset.
+ * Validates purchase histories to restrict review submission flags.
+ */
+exports.getBookDetail = async (req, res) => {
+    try {
+        const bookId = req.params.id;
+        const sessionUser = req.session.user || null;
+
+        const book = await Book.findById(bookId).lean();
+        if (!book) {
+            return res.status(404).send('The requested book listing does not exist.');
+        }
+
+        const reviews = await Review.find({ book: bookId })
+            .populate('user', 'username')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const relatedBooks = await Book.find({
+            category: book.category,
+            _id: { $ne: book._id }
+        }).limit(4).lean();
+
+        // VALIDASI EMPIRIS: Memeriksa apakah user aktif sudah pernah membeli buku ini sampai sukses
+        let hasPurchased = false;
+        if (sessionUser && sessionUser.role === 'user') {
+            const completedOrder = await Order.findOne({
+                user: sessionUser.id,
+                status: 'Completed',
+                'items.book': bookId
+            }).lean();
+            if (completedOrder) {
+                hasPurchased = true;
+            }
+        }
+
+        res.render('pages/bookDetail', {
+            pageTitle: `${book.title} - Litera Bookstore`,
+            book,
+            relatedBooks,
+            reviews,
+            user: sessionUser,
+            hasPurchased
+        });
+    } catch (err) {
+        console.error('Error compiling asset product details view data:', err);
+        res.status(500).send('Internal Server Error fetching resource details.');
+    }
+};
+
+/**
+ * Execute text pattern queries across title, author, and genre fields inside MongoDB.
+ */
+exports.searchBooks = async (req, res, next) => {
+    try {
+        const query = req.query.q ? req.query.q.trim() : '';
+        
+        if (!query) {
+            return res.render('pages/searchResult', {
+                pageTitle: 'Search Results - Litera Bookstore',
+                query: '',
+                books: []
+            });
+        }
+
+        const books = await Book.find({
+            $or: [
+                { title: { $regex: query, $options: 'i' } },
+                { author: { $regex: query, $options: 'i' } },
+                { genre: { $regex: query, $options: 'i' } }
+            ]
+        }).lean();
+
+        res.render('pages/searchResult', {
+            pageTitle: `Search Results for "${query}" - Litera Bookstore`,
+            query: query,
+            books: books
+        });
+    } catch (error) {
+        next(error);
+    }
+};

@@ -1,63 +1,130 @@
 <%- include('../partials/navbar') %>
 
 <%
-  const banners = [
-    { image: "/img/carousel-1.png", alt: "Promo 1" },
-    { image: "/img/carousel-2.png", alt: "Promo 2" }
+  const promotionalBannersMatrix = [
+    { image: "/img/carousel-1.png", alt: "Litera Bookstore Promotion 1" },
+    { image: "/img/carousel-2.png", alt: "Litera Bookstore Promotion 2" }
   ];
 %>
-<div id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+
+<div id="heroPlatformCarousel" class="carousel slide mb-5" data-bs-ride="carousel" style="margin-top: -80px;">
   <div class="carousel-indicators">
-    <% banners.forEach((_, index) => { %>
-      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="<%= index %>" class="<%= index === 0 ? 'active' : '' %>"></button>
+    <% promotionalBannersMatrix.forEach((_, indexAnchor) => { %>
+      <button type="button" data-bs-target="#heroPlatformCarousel" data-bs-slide-to="<%= indexAnchor %>" class="<%= indexAnchor === 0 ? 'active' : '' %>" aria-current="<%= indexAnchor === 0 ? 'true' : 'false' %>"></button>
     <% }); %>
   </div>
   <div class="carousel-inner">
-    <% banners.forEach((banner, index) => { %>
-      <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-        <img src="<%= banner.image %>" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="<%= banner.alt %>">
+    <% promotionalBannersMatrix.forEach((banner, indexItem) => { %>
+      <div class="carousel-item <%= indexItem === 0 ? 'active' : '' %>">
+        <img src="<%= banner.image %>" class="d-block w-100" style="height: 400px; object-fit: cover; filter: brightness(0.85);" alt="<%= banner.alt %>">
       </div>
     <% }); %>
   </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroPlatformCarousel" data-bs-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
   </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+  <button class="carousel-control-next" type="button" data-bs-target="#heroPlatformCarousel" data-bs-slide="next">
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
   </button>
 </div>
 
-<div class="container">
+<div class="container mb-5 home-infrastructure-anchor">
 
-    <% function renderBookSection(title, books) { %>
-        <% if (books && books.length > 0) { %>
-            <section class="mb-5">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3 class="fw-bold border-start border-4 border-primary ps-3"><%= title %></h3>
-                    <a href="#" class="text-decoration-none">Lihat Semua &rarr;</a>
+    <% 
+    const isGlobalInventoryEmpty = (!newArrivals || newArrivals.length === 0) && 
+                                   (!bestsellers || bestsellers.length === 0) && 
+                                   (!fiction || fiction.length === 0) && 
+                                   (!nonFiction || nonFiction.length === 0) && 
+                                   (!technology || technology.length === 0) && 
+                                   (!comic || comic.length === 0) && 
+                                   (!biography || biography.length === 0);
+    %>
+
+    <% if (isGlobalInventoryEmpty) { %>
+        <div class="text-center py-5 my-5 bg-white rounded-3 border p-5 shadow-sm">
+            <div class="display-1 text-muted mb-3"><i class="bi bi-bookshelf"></i></div>
+            <h2 class="fw-bold text-dark mb-2">Central Bookshelf Vault is Vacant</h2>
+            <p class="text-secondary mx-auto mb-4" style="max-width: 600px;">No books are detected inside the database cluster. Please log in using your administrator credentials to upload assets directly via the management form dashboard.</p>
+            <a href="/auth/login" class="btn btn-primary fw-bold rounded-pill px-5 py-2.5 text-white shadow-sm">
+                Authenticate Admin Access Node
+            </a>
+        </div>
+    <% } else { %>
+        
+        <% 
+        function renderStandardizedBookSection(sectionTitleLabel, targetBooksArray, isGenreSection = false, genreSearchQuery = '') { 
+            if (targetBooksArray && targetBooksArray.length > 0) {
+        %>
+            <section class="mb-5 animate-fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                    <h3 class="fw-bold text-dark mb-0"><%= sectionTitleLabel %></h3>
+                    
+                    <% if (isGenreSection) { %>
+                        <a href="/search?q=<%= encodeURIComponent(genreSearchQuery) %>" class="text-primary fw-semibold text-decoration-none small hover-link">
+                            View All <i class="bi bi-arrow-right font-sm"></i>
+                        </a>
+                    <% } else { %>
+                        <span class="badge bg-secondary rounded-pill px-3 py-1 font-sm">Top 5 Records</span>
+                    <% } %>
                 </div>
-                
-                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
-                    <% books.forEach(book => { %>
-                        <div class="col">
-                            <div class="card h-100 border-0 shadow-sm book-card">
-                                <a href="/store/book/<%= book._id %>">
-                                    <img src="<%= book.coverImage %>" class="card-img-top" alt="<%= book.title %>" style="height: 350px; object-fit: cover;">
-                                </a>
-                                <div class="card-body d-flex flex-column">
-                                    <h6 class="card-title fw-bold text-truncate" title="<%= book.title %>">
-                                        <a href="/store/book/<%= book._id %>" class="text-decoration-none text-dark">
-                                            <%= book.title %>
-                                        </a>
-                                    </h6>
-                                    <p class="text-muted small mb-2"><%= book.author %></p>
-                                    <div class="mt-auto">
-                                        <p class="fw-bold text-primary mb-2">Rp <%= book.price.toLocaleString('id-ID') %></p>
-                                        <form action="/cart/add/<%= book._id %>" method="POST">
-                                            <button class="btn btn-primary btn-sm w-100 rounded-pill" type="submit">
-                                                Tambah Keranjang
-                                            </button>
-                                        </form>                                        
+
+                <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
+                    <% targetBooksArray.forEach(book => { %>
+                        <div class="col d-flex align-items-stretch">
+                            <div class="card w-100 shadow-sm border-0 book-card-transition p-2 bg-white rounded-3 d-flex flex-column justify-content-between">
+                                <div class="position-relative text-center bg-light rounded p-3 mb-2" style="height: 220px; display: flex; align-items: center; justify-content: center;">
+                                    <img src="<%= book.coverImage %>" class="img-fluid rounded shadow-sm" style="max-height: 180px; object-fit: contain;" alt="<%= book.title %>">
+                                    <% if (book.stock === 0) { %>
+                                        <div class="position-absolute top-50 start-50 translate-middle bg-danger bg-opacity-90 text-white fw-bold px-3 py-1 small rounded-pill shadow-sm font-sm">
+                                            OUT OF STOCK
+                                        </div>
+                                    <% } %>
+                                </div>
+                                <div class="card-body p-2 d-flex flex-column justify-content-between flex-grow-1">
+                                    <div class="mb-2">
+                                        <h6 class="card-title fw-bold text-dark text-truncate mb-1" title="<%= book.title %>"><%= book.title %></h6>
+                                        <p class="card-text text-muted font-sm text-truncate mb-1">By <%= book.author %></p>
+                                        
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <div class="text-warning font-sm d-flex align-items-center">
+                                                <% 
+                                                    const currentRatingValue = typeof book.averageRating !== 'undefined' && book.averageRating ? book.averageRating : 0;
+                                                    for (let i = 1; i <= 5; i++) { 
+                                                %>
+                                                    <i class="bi <%= i <= Math.round(currentRatingValue) ? 'bi-star-fill' : 'bi-star' %> me-0.5"></i>
+                                                <% } %>
+                                                <span class="text-dark fw-semibold ms-1" style="font-size: 0.7rem;"><%= currentRatingValue > 0 ? currentRatingValue.toFixed(1) : '0.0' %></span>
+                                            </div>
+                                            <div class="text-muted border-start ps-2" style="font-size: 0.7rem;">
+                                                <span><%= typeof book.salesCount !== 'undefined' && book.salesCount ? book.salesCount : 0 %> sold</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div>
+                                        <h6 class="text-danger fw-bold mb-3">Rp <%= book.price.toLocaleString('id-ID') %></h6>
+                                        
+                                        <% if (typeof user !== 'undefined' && user && user.role === 'user') { %>
+                                            <div class="row g-2">
+                                                <div class="col-12">
+                                                    <a href="/store/book/<%= book._id %>" class="btn btn-outline-primary btn-sm fw-semibold rounded-pill w-100 py-1.5 font-sm">View Details</a>
+                                                </div>
+                                                <div class="col-12">
+                                                    <form action="/cart/add/<%= book._id %>" method="POST" class="ajax-cart-form">
+                                                        <button type="submit" class="btn btn-primary btn-sm fw-semibold rounded-pill w-100 py-1.5 text-white font-sm" <%= book.stock === 0 ? 'disabled' : '' %>>
+                                                            <i class="bi bi-cart-plus me-1"></i>Add To Cart
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="d-grid">
+                                                <a href="/store/book/<%= book._id %>" class="btn btn-outline-primary btn-sm fw-semibold rounded-pill py-1.5 font-sm">View Details</a>
+                                            </div>
+                                        <% } %>
+
                                     </div>
                                 </div>
                             </div>
@@ -65,132 +132,113 @@
                     <% }) %>
                 </div>
             </section>
-        <% } %>
+        <% 
+            }
+        } 
+        %>
+
+        <% renderStandardizedBookSection('New Arrivals', typeof newArrivals !== 'undefined' ? newArrivals : [], false) %>
+        <% renderStandardizedBookSection('Best Seller', typeof bestsellers !== 'undefined' ? bestsellers : [], false) %>
+        <% renderStandardizedBookSection('Fiction', typeof fiction !== 'undefined' ? fiction : [], true, 'Fiction') %>
+        <% renderStandardizedBookSection('Non-Fiction', typeof nonFiction !== 'undefined' ? nonFiction : [], true, 'Non-Fiction') %>
+        <% renderStandardizedBookSection('Technology & Science', typeof technology !== 'undefined' ? technology : [], true, 'Technology & Science') %>
+        <% renderStandardizedBookSection('Comic & Graphic Novels', typeof comic !== 'undefined' ? comic : [], true, 'Comic & Graphic Novel') %>
+        <% renderStandardizedBookSection('Biography & History', typeof biography !== 'undefined' ? biography : [], true, 'Biography & History') %>
+
     <% } %>
-
-    <% renderBookSection('New Arrivals', newArrivals) %>
-
-    <% renderBookSection('Best Seller', bestsellers) %>
-
-    <div class="my-5">
-        <img src="/img/carousel-2.png" class="img-fluid w-100 rounded shadow-sm" alt="Promo Spesial" style="height: 200px; object-fit: cover;">
-    </div>
-
-    <% if (fiction && fiction.length > 0) { %>
-    <section class="mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3 class="fw-bold border-start border-4 border-primary ps-3">Literary & General Fiction</h3>
-            <a href="#" class="text-decoration-none">Lihat Semua &rarr;</a>
-        </div>
-        
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
-            <% fiction.forEach(book => { %>
-                <div class="col">
-                    <div class="card h-100 border-0 shadow-sm book-card">
-                        <a href="/store/book/<%= book._id %>">
-                            <img src="<%= book.coverImage %>" class="card-img-top" alt="<%= book.title %>" style="height: 350px; object-fit: cover;">
-                        </a>
-                        <div class="card-body d-flex flex-column">
-                            <h6 class="card-title fw-bold text-truncate" title="<%= book.title %>">
-                                <a href="/store/book/<%= book._id %>" class="text-decoration-none text-dark">
-                                    <%= book.title %>
-                                </a>
-                            </h6>
-                            <p class="text-muted small mb-2"><%= book.author %></p>
-                            <div class="mt-auto">
-                                <p class="fw-bold text-primary mb-2">Rp <%= book.price.toLocaleString('id-ID') %></p>
-                                <form action="/cart/add/<%= book._id %>" method="POST">
-                                    <button class="btn btn-primary btn-sm w-100 rounded-pill" type="submit">
-                                        Tambah Keranjang
-                                    </button>
-                                </form>                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <% }) %>
-        </div>
-    </section>
-    <% } %>
-
-    <% if (nonFiction && nonFiction.length > 0) { %>
-    <section class="mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3 class="fw-bold border-start border-4 border-primary ps-3">Non-Fiction</h3>
-            <a href="#" class="text-decoration-none">Lihat Semua &rarr;</a>
-        </div>
-        
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
-            <% nonFiction.forEach(book => { %>
-                <div class="col">
-                    <div class="card h-100 border-0 shadow-sm book-card">
-                        <a href="/store/book/<%= book._id %>">
-                            <img src="<%= book.coverImage %>" class="card-img-top" alt="<%= book.title %>" style="height: 350px; object-fit: cover;">
-                        </a>
-                        <div class="card-body d-flex flex-column">
-                            <h6 class="card-title fw-bold text-truncate" title="<%= book.title %>">
-                                <a href="/store/book/<%= book._id %>" class="text-decoration-none text-dark">
-                                    <%= book.title %>
-                                </a>
-                            </h6>
-                            <p class="text-muted small mb-2"><%= book.author %></p>
-                            <div class="mt-auto">
-                                <p class="fw-bold text-primary mb-2">Rp <%= book.price.toLocaleString('id-ID') %></p>
-                                <form action="/cart/add/<%= book._id %>" method="POST">
-                                    <button class="btn btn-primary btn-sm w-100 rounded-pill" type="submit">
-                                        Tambah Keranjang
-                                    </button>
-                                </form>                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <% }) %>
-        </div>
-    </section>
-    <% } %>
-
-    <% renderBookSection('Sci-Fi & Fantasy', scifi) %>
-    <% renderBookSection('Mystery & Thriller', mystery) %>
-    <% renderBookSection('Biography', biography) %>
 
 </div>
 
-<% if (typeof success !== 'undefined' && success) { %>
-    <div id="popup-alert" class="popup-alert" style="background: #27ae60;">
-        <%= success %>
-    </div>
-    <style>
-        .popup-alert {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #27ae60;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            font-weight: 600;
-            z-index: 9999;
-            opacity: 0;
-            animation: fadeInOut 3s ease forwards;
-        }
+<div id="runtime-popup-alert" class="popup-alert-node" style="display: none;"></div>
 
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            80% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-        }
-    </style>
+<% if (typeof success !== 'undefined' && success) { %>
     <script>
-        // Ensure popup element is removed after animation in case CSS doesn't hide it
-        setTimeout(() => {
-            const p = document.getElementById('popup-alert');
-            if (p) p.remove();
-        }, 3200);
+        document.addEventListener("DOMContentLoaded", () => {
+            showToastAlert("<%= success %>");
+        });
     </script>
 <% } %>
+
+<script>
+    function showToastAlert(textMessage) {
+        const toastNode = document.getElementById('runtime-popup-alert');
+        if (toastNode) {
+            toastNode.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>${textMessage}`;
+            toastNode.style.display = 'block';
+            setTimeout(() => {
+                toastNode.style.display = 'none';
+            }, 3500);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const cartForms = document.querySelectorAll('.ajax-cart-form');
+        
+        cartForms.forEach(form => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                const targetUrl = form.getAttribute('action');
+                const submitButton = form.querySelector('button[type="submit"]');
+                const originalButtonHtml = submitButton.innerHTML;
+                
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Adding...';
+                
+                try {
+                    const response = await fetch(targetUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        const cartBadge = document.querySelector('.navbar .badge');
+                        if (cartBadge) {
+                            cartBadge.textContent = result.cartCount;
+                        }
+                        showToastAlert(result.message);
+                    } else {
+                        alert(result.error || 'Failed to add item to cart.');
+                    }
+                } catch (error) {
+                    console.error('AJAX Cart operational failure:', error);
+                    alert('Network error. Failed to communicate with server.');
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonHtml;
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .home-infrastructure-anchor { min-height: 75vh; }
+    .font-sm { font-size: 0.75rem; }
+    .book-card-transition { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+    .book-card-transition:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important; }
+    .hover-link:hover { text-decoration: underline !important; color: #0a58ca !important; }
+    .animate-fade-in { animation: runFadeIn 0.4s ease-out forwards; }
+    
+    .popup-alert-node {
+        position: fixed;
+        top: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #27ae60;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        font-weight: 600;
+        z-index: 1050;
+    }
+
+    @keyframes runFadeIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+</style>
 
 <%- include('../partials/footer') %>

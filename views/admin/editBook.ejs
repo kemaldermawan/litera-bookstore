@@ -1,109 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'Edit Book - Litera Admin' %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-light">
+
 <%- include('../partials/navbarAdmin') %> 
-<div class="container py-5">
+
+<div class="container py-5" style="margin-top: 40px; padding-bottom: 48px;">
     <section class="p-4 p-md-5 bg-white border rounded shadow-sm">
         
-        <h2 class="card-title mb-4">Edit Buku:</h2>
-        <p class="text-muted mb-4">Ubah informasi buku di bawah ini dan tekan "Update Buku" untuk menyimpan perubahan.</p>
+        <div class="d-flex align-items-center mb-4 border-bottom pb-3">
+            <a href="/admin/dashboard" class="btn btn-outline-secondary rounded-circle me-3 d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h2 class="card-title mb-1 fw-bold text-dark">Edit Book Details</h2>
+                <p class="text-muted mb-0">Update the store catalog entry for: <span class="text-danger fw-semibold">"<%= book.title %>"</span></p>
+            </div>
+        </div>
 
-        <!-- ACTION diarahkan ke controller update -->
         <form action="/admin/books/update/<%= book._id %>" method="POST" enctype="multipart/form-data">
             
-            <div class="row mb-3">
+            <div class="row mb-4 g-3">
                 <div class="col-md-6">
-                    <label for="judul" class="form-label">Judul Buku</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        id="judul" 
-                        name="judul" 
-                        value="<%= book.title %>" 
-                        required
-                    >
+                    <label for="title" class="form-label small fw-bold">Book Title</label>
+                    <input type="text" class="form-control" id="title" name="title" value="<%= book.title %>" placeholder="Enter book title" required>
                 </div>
 
                 <div class="col-md-6">
-                    <label for="penulis" class="form-label">Penulis</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        id="penulis" 
-                        name="penulis" 
-                        value="<%= book.author %>" 
-                        required
-                    >
+                    <label for="author" class="form-label small fw-bold">Author</label>
+                    <input type="text" class="form-control" id="author" name="author" value="<%= book.author %>" placeholder="Author's full name" required>
                 </div>
             </div>
 
             <div class="row mb-4">
                 <div class="col-12">
-                    <label for="sinopsis" class="form-label">Sinopsis</label>
-                    <textarea 
-                        class="form-control" 
-                        id="sinopsis" 
-                        name="sinopsis" 
-                        rows="3" 
-                        required
-                    ><%= book.synopsis %></textarea>
+                    <label for="synopsis" class="form-label small fw-bold">Synopsis</label>
+                    <textarea class="form-control" id="synopsis" name="synopsis" rows="6" placeholder="Provide book synopsis..." required><%= book.synopsis %></textarea>
                 </div>
             </div>
 
-            <div class="row g-3 mb-4 align-items-end">
-                
+            <div class="row mb-4 g-3">
                 <div class="col-md-3 col-6">
-                    <label for="harga" class="form-label">Harga</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        id="harga" 
-                        name="harga" 
-                        value="<%= book.price %>" 
-                        required
-                    >
+                    <label for="price" class="form-label small fw-bold">Price (IDR)</label>
+                    <input type="number" class="form-control" id="price" name="price" value="<%= book.price %>" placeholder="e.g., 95000" required>
                 </div>
-                
+
                 <div class="col-md-3 col-6">
-                    <label for="stok" class="form-label">Stok</label>
-                    <input 
-                        type="number" 
-                        class="form-control" 
-                        id="stok" 
-                        name="stok" 
-                        value="<%= book.stock %>" 
-                        required
-                    >
+                    <label for="stock" class="form-label small fw-bold">Stock Quantity</label>
+                    <input type="number" class="form-control" id="stock" name="stock" min="0" value="<%= book.stock %>" placeholder="e.g., 10" required>
                 </div>
-                
+
                 <div class="col-md-3 col-6">
-                    <label for="kategori" class="form-label">Kategori</label>
-                    <select id="kategori" name="kategori" class="form-select">
-                        <option value="Fiksi" <%= book.category === 'Fiksi' ? 'selected' : '' %>>Fiksi</option>
-                        <option value="Non-Fiksi" <%= book.category === 'Non-Fiksi' ? 'selected' : '' %>>Non-Fiksi</option>
-                        <option value="Edukasi" <%= book.category === 'Edukasi' ? 'selected' : '' %>>Edukasi</option>
+                    <label for="category" class="form-label small fw-bold">Genre / Category</label>
+                    <select id="category" class="form-select fw-medium" name="category" required>
+                        <option value="Fiction" <%= book.category === 'Fiction' ? 'selected' : '' %>>Fiction</option>
+                        <option value="Non-Fiction" <%= book.category === 'Non-Fiction' ? 'selected' : '' %>>Non-Fiction</option>
+                        <option value="Technology & Science" <%= book.category === 'Technology & Science' ? 'selected' : '' %>>Technology & Science</option>
+                        <option value="Comic & Graphic Novel" <%= book.category === 'Comic & Graphic Novel' ? 'selected' : '' %>>Comic & Graphic Novel</option>
+                        <option value="Biography & History" <%= book.category === 'Biography & History' ? 'selected' : '' %>>Biography & History</option>
+                        <option value="Children & Young Adult" <%= book.category === 'Children & Young Adult' ? 'selected' : '' %>>Children & Young Adult</option>
+                        <option value="Textbook & Education" <%= book.category === 'Textbook & Education' ? 'selected' : '' %>>Textbook & Education</option>
                     </select>
                 </div>
                 
                 <div class="col-md-3 col-6">
-                    <label for="ganti_cover" class="form-label">Ganti Cover</label>
-                    <input 
-                        type="file" 
-                        class="form-control" 
-                        id="ganti_cover" 
-                        name="coverImage"
-                    >
-                    <small class="text-muted d-block mt-1">
-                        Cover saat ini: <%= book.cover %>
+                    <label for="coverImage" class="form-label small fw-bold">Replace Cover Image</label>
+                    <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/*">
+                    <small class="text-muted d-block mt-1 text-truncate">
+                        Current cover: <span class="font-monospace text-danger small"><%= book.coverImage %></span>
                     </small>
                 </div>
             </div>
 
-            <hr class="mt-4 mb-4">
+            <hr class="my-4">
 
             <div class="row justify-content-end g-3">
                 <div class="col-auto">
-                    <a href="/admin/books" class="btn btn-outline-danger btn-lg">Batal</a>
+                    <a href="/admin/dashboard" class="btn btn-outline-secondary fw-bold px-4 rounded-pill">Cancel</a>
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary btn-lg">Update Buku</button>
+                    <button type="submit" class="btn btn-success fw-bold px-4 rounded-pill shadow-sm">
+                        <i class="bi bi-check-circle-fill me-1"></i>Save Changes
+                    </button>
                 </div>
             </div>
 
@@ -112,7 +97,8 @@
     </section>
 </div>
 
-<script src="/js/bootstrap.bundle.min.js"></script>
-<script src="/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<%- include('../partials/footer') %>
 </body>
 </html>

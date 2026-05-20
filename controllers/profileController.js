@@ -1,166 +1,150 @@
 const User = require('../models/User');
-const Order = require('../models/Order'); 
+const Order = require('../models/Order');
 
+/**
+ * Render the user's secure profile dashboard.
+ */
 exports.getProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
-        
-        // Ambil data user lengkap dari DB (penting untuk address yang up-to-date)
+
         const user = await User.findById(userId).lean();
-        
         if (!user) {
-            // Jika user tidak ditemukan (meskipun ada di sesi)
-            return res.redirect('/login');
+            return res.redirect('/auth/login?error=Session invalid. User account not found.');
         }
-        
-        // Ambil riwayat transaksi user
+
         const orders = await Order.find({ user: userId })
-            // Populate detail buku (title, coverImage) untuk setiap item di order
-            .populate('items.book', 'title coverImage') 
-            // Urutkan dari yang terbaru
+            .populate('items.book', 'title coverImage')
             .sort({ createdAt: -1 })
-            .lean(); 
+            .lean();
 
-        // Ambil pesan sukses dari session jika ada
-        const success = req.session ? req.session.success : null;
-        if (req.session && success) delete req.session.success;
+        const success = req.query.success || (req.session ? req.session.success : null);
+        if (req.session && req.session.success) {
+            delete req.session.success;
+        }
 
-        // RENDER halaman dengan data user dan orders
+        const notification = req.query.notification || null;
+
         res.render('pages/profile', {
-            user: user, 
-            orders: orders, // <-- DATA RIWAYAT TRANSAKSI
-            success: success || null
+            pageTitle: `${user.username}'s Profile - Litera Bookstore`,
+            user,
+            orders,
+            success,
+            notification
         });
-        
     } catch (err) {
-        console.error('Error loading profile:', err);
-        // Fallback jika terjadi error server
-        res.render('pages/profile', { user: req.session.user, orders: [] });
+        console.error('Critical profile view retrieval failure:', err);
+        res.render('pages/profile', { 
+            pageTitle: 'Profile - Litera Bookstore',
+            user: req.session.user, 
+            orders: [],
+            success: null,
+            notification: 'Error loading structural history data.'
+        });
     }
 };
 
-exports.updateAddress = async (req, res) => {
-
-    if (!req.session.user) return res.redirect('/login');
-
-    const { street, city, province, postalCode } = req.body;
-
-    // Tambahkan pengamanan untuk address jika belum ada
-    const addressData = { 
-        street: street || '', 
-        city: city || '', 
-        province: province || '', 
-        postalCode: postalCode || '' 
-    };
-
-    const updatedUser = await User.findByIdAndUpdate(
-        req.session.user.id,
-        { address: addressData },
-        { new: true }
-    );
-
-    // Update sesi dengan data address terbaru
-    req.session.user.address = updatedUser.address;
-
-    // Perlu me-redirect ke /profile agar getProfile dipanggil ulang dengan data terbaru
-    res.redirect('/profile');
-};
-
-exports.deleteAccount = async (req, res) => {
-    try {
-        if (!req.session.user) return res.redirect('/login');
-
-        const userId = req.session.user.id;
-
-        // Hapus user dari database
-        await User.findByIdAndDelete(userId);
-
-        // Destroy session dan set pesan
-        req.session.destroy((err) => {
-            if (err) {
-                console.error('Error destroying session:', err);
-                return res.status(500).json({ success: false, message: 'Gagal menghapus akun' });
-            }
-
-            // Redirect ke login dengan pesan sukses
-            res.redirect('/login?deleted=true');
-        });
-
-    } catch (err) {
-        console.error('Error deleting account:', err);
-        res.status(500).json({ success: false, message: 'Gagal menghapus akun' });
-    }
-};
-
+/**
+ * Render the profile modification form layout.
+ */
 exports.getEditProfile = async (req, res) => {
     try {
-        if (!req.session.user) return res.redirect('/login');
-
-        const userId = req.session.user.id;
-        const user = await User.findById(userId).lean();
-
-        if (!user) {
-            return res.redirect('/login');
+        if (!req.session.user) {
+            return res.redirect('/auth/login');
         }
 
-        res.render('pages/edit-profile', {
-            user: user
-        });
+        const user = await User.findById(req.session.user.id).lean();
+        if (!user) {
+            return res.redirect('/auth/login');
+        }
 
+        // SINKRONISASI: Mengubah 'pages/edit-profile' menjadi 'pages/editProfile' sesuai file fisik
+        res.render('pages/editProfile', {
+            pageTitle: 'Edit Profile - Litera Bookstore',
+            user,
+            error: null
+        });
     } catch (err) {
-        console.error('Error loading edit profile:', err);
-        res.redirect('/profile');
+        console.error('Error loading edit profile workspace:', err);
+        res.redirect('/auth/profile');
     }
 };
 
+/**
+ * Process text parameters, logistics addresses, and physical binary file uploads for user profiles.
+ */
 exports.postEditProfile = async (req, res) => {
     try {
-        if (!req.session.user) return res.redirect('/login');
-
-        const userId = req.session.user.id;
-        console.log('postEditProfile called for user:', userId);
-        console.log('req.file:', req.file);
-        const { bio } = req.body;
-
-        const updateData = {
-            bio: bio || ''
-        };
-
-        // Handle file upload jika ada
-        if (req.file) {
-            updateData.profilePicture = '/img/profiles/' + req.file.filename;
-            try {
-                const fs = require('fs');
-                const savedPath = 'public/img/profiles/' + req.file.filename;
-                const exists = fs.existsSync(savedPath);
-                console.log('Expected saved file path:', savedPath, 'exists:', exists);
-            } catch (e) {
-                console.error('Error checking saved file:', e);
-            }
+        if (!req.session.user) {
+            return res.redirect('/auth/login');
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            updateData,
-            { new: true }
-        );
+        // Menangkap data biografi, nomor telepon, dan nested object data alamat dari editProfile.ejs
+        const { bio, phone, address } = req.body;
+        const userId = req.session.user.id;
 
-        // Update session dengan data baru
-        req.session.user.bio = updatedUser.bio;
-        req.session.user.profilePicture = updatedUser.profilePicture;
+        const updateData = { 
+            bio: bio || '',
+            phone: phone || '',
+            address: {
+                street: (address && address.street) ? address.street : '',
+                city: (address && address.city) ? address.city : '',
+                postalCode: (address && address.postalCode) ? address.postalCode : ''
+            }
+        };
 
-        // Set success message dan redirect ke profile
-        req.session.success = 'Profil berhasil diperbarui!';
-        res.redirect('/profile');
+        if (req.file) {
+            updateData.profilePicture = `/img/profiles/${req.file.filename}`;
+        }
 
+        const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true }).lean();
+
+        req.session.user = {
+            id: updatedUser._id,
+            email: updatedUser.email,
+            username: updatedUser.username,
+            role: updatedUser.role,
+            phone: updatedUser.phone,
+            bio: updatedUser.bio,
+            profilePicture: updatedUser.profilePicture,
+            address: updatedUser.address
+        };
+
+        res.redirect('/auth/profile?success=Profile and logistical records updated successfully.');
     } catch (err) {
-        console.error('Error updating profile:', err);
+        console.error('Critical profile edit database operation error:', err);
         const user = await User.findById(req.session.user.id).lean();
-        res.render('pages/edit-profile', {
-            user: user,
-            error: 'Gagal memperbarui profil'
+        res.render('pages/editProfile', {
+            pageTitle: 'Edit Profile - Litera Bookstore',
+            user,
+            error: 'Failed to apply configuration updates to your account.'
         });
     }
 };
 
+/**
+ * Execute critical account erasure operational processes.
+ */
+exports.deleteAccount = async (req, res) => {
+    try {
+        if (!req.session.user) {
+            return res.redirect('/auth/login');
+        }
 
+        const userId = req.session.user.id;
+
+        await User.findByIdAndDelete(userId);
+
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Critical operational session termination failure:', err);
+                return res.status(500).json({ success: false, message: 'Failed to flush session tracking data.' });
+            }
+            res.clearCookie('connect.sid');
+            res.redirect('/auth/login?deleted=true');
+        });
+    } catch (err) {
+        console.error('Account erasure runtime operational failure:', err);
+        res.status(500).json({ success: false, message: 'Internal Server Error handling profile deletion.' });
+    }
+};

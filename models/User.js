@@ -10,23 +10,24 @@ const UserSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
-
     phone: { 
         type: String, 
         required: true 
     },
-
     address: {
         street: { type: String, default: '' },
         city: { type: String, default: '' },
         province: { type: String, default: '' },
         postalCode: { type: String, default: '' }
     },
-
     bio: { type: String, default: '' },
     profilePicture: { type: String, default: '/img/default-profile.jpg' }
 }, { timestamps: true });
 
+/**
+ * Pre-save middleware hook to execute cryptographic bcrypt hashing on password strings
+ * before committing configuration documents to the MongoDB database instance.
+ */
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) {
         return next();
@@ -36,6 +37,10 @@ UserSchema.pre('save', async function(next) {
     next();
 });
 
+/**
+ * Custom schema method instance to process string-matching comparisons
+ * against the encrypted password hashes safely.
+ */
 UserSchema.methods.comparePassword = async function(enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };

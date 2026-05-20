@@ -1,166 +1,145 @@
 const Book = require("../models/Book");
-const Cart = require("../models/cart");
 const Order = require("../models/Order");
+const mongoose = require("mongoose");
 
-exports.buyNow = async (req, res) => {
+/**
+ * Render the secure checkout overview interface for physical book reservations.
+ * Maps operational items directly from the Express Session payload state.
+ */
+exports.checkoutCart = async (req, res) => {
     try {
-        const bookId = req.params.bookId;
+        const sessionCart = req.session.cart || [];
+        if (sessionCart.length === 0) {
+            return res.redirect("/cart?error=Checkout initialization failed. Your shopping cart is currently empty.");
+        }
 
-        const book = await Book.findById(bookId);
-        if (!book) return res.redirect("/");
+        // Map session-based data items safely to structural presentation array models
+        const checkoutItems = sessionCart.map(item => ({
+            id: item.bookId,
+            title: item.title,
+            price: item.price,
+            quantity: item.qty,
+            coverImage: item.coverImage 
+        }));
 
-        const items = [
-            {
-                id: book._id,
-                title: book.title,
-                price: book.price,
-                quantity: 1,
-                coverImage: book.coverImage
-            }
-        ];
+        // Compute pricing aggregates across the mapped array structure
+        const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-        const subtotal = book.price;
+        // Double-check profile presence context parameters before rendering layout targets
+        if (!req.session.user) {
+            return res.redirect("/auth/login?error=Session timeout. Please sign in again.");
+        }
 
         return res.render("pages/checkout", {
+            pageTitle: "Secure Checkout - Litera Bookstore",
             user: req.session.user,
-            items,
+            items: checkoutItems,
             subtotal,
-            isBuyNow: true
+            isBuyNow: false
         });
-
     } catch (err) {
-        console.error(err);
-        res.redirect("/");
+        console.error("Critical checkout view generation failure:", err);
+        res.redirect("/cart?error=Internal error preparing checkout parameters.");
     }
 };
 
-// checkoutController.js
-
-exports.checkoutCart = async (req, res) => {
-    // GANTI: Ambil dari Sesi, bukan MongoDB. (Seperti yang dilakukan cartController.js)
-    const sessionCart = req.session.cart || [];
-
-    if (sessionCart.length === 0) {
-        return res.redirect("/cart"); // Keranjang sesi kosong
-    }
-
-    // Karena item di sesi sudah berisi data lengkap (title, price, dll),
-    // kita tidak perlu populate, kita hanya memetakan strukturnya.
-
-    const checkoutItems = sessionCart.map(item => ({
-        id: item.bookId, // bookId dari sesi menjadi id untuk checkout.ejs
-        title: item.title,
-        price: item.price,
-        quantity: item.qty, // qty dari sesi menjadi quantity untuk checkout.ejs
-        coverImage: item.coverImage 
-    }));
-
-    const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    // Periksa untuk memastikan variabel `user` ada sebelum merender
-    if (!req.session.user) {
-        return res.redirect("/login");
-    }
-
-    return res.render("pages/checkout", {
-        user: req.session.user,
-        isBuyNow: false,
-        items: checkoutItems,
-        subtotal: subtotal
-    });
-};
-
-// checkoutController.js
-
+/**
+ * Validate shelf stock availability and construct a new local store order transaction.
+ * Synchronizes body-driven quantities and maps dynamic payment types into MongoDB.
+ */
 exports.createOrder = async (req, res) => {
-    const { paymentMethod, isBuyNow, bookId } = req.body;
-    const user = req.session.user;
-
-    // Periksa user dan address (Wajib Lolos Middleware)
-    if (!user || !user.id || !user.address || !user.address.city || !user.phone) {
-        return res.redirect("/profile?need=complete-profile");
-    }
-
-    let items = [];
-    let totalPrice = 0;
-
-    if (isBuyNow === "true") {
-        // --- LOGIC UNTUK BUY NOW ---
-        const book = await Book.findById(bookId);
-        if (!book) return res.redirect("/");
-
-        items.push({
-            book: book._id,
-            quantity: 1,
-            priceAtPurchase: book.price
-        });
-        totalPrice = book.price;
-
-    } else {
-        // --- LOGIC UNTUK CHECKOUT DARI CART SESSION ---
+    try {
         const sessionCart = req.session.cart || [];
+        const bodyQuantities = req.body.qty || {};
+        const { paymentMethod } = req.body;
+        const user = req.session.user;
 
         if (sessionCart.length === 0) {
-            return res.redirect("/cart?error=empty-cart");
+            return res.redirect("/cart?error=Order placement rejected. Empty cart footprint.");
         }
+
+        // Strict fallback validation check to enforce baseline profile phone and address requirements
+        if (!user || !user.id) {
+            return res.redirect("/auth/profile?notification=complete_profile_required");
+        }
+
+        const items = [];
         
-        items = sessionCart.map(item => ({
-            book: item.bookId,
-            quantity: item.qty,
-            priceAtPurchase: item.price
+        // --- QUANTITY RE-VALIDATION & INVENTORY STOCK CHECK ---
+        for (const item of sessionCart) {
+            const finalQty = bodyQuantities[item.bookId] ? parseInt(bodyQuantities[item.bookId]) : item.qty;
+            
+            const currentBook = await Book.findById(item.bookId);
+            if (!currentBook) {
+                return res.redirect("/cart?error=One or more items in your cart do not exist in our library.");
+            }
+            if (currentBook.stock < finalQty) {
+                return res.redirect(`/cart?error=Reservation failed. "${item.title}" only has ${currentBook.stock} units available.`);
+            }
+
+            items.push({
+                book: item.bookId,
+                quantity: finalQty,
+                priceAtPurchase: item.price
+            });
+        }
+
+        const totalPrice = items.reduce((sum, i) => sum + (i.priceAtPurchase * i.quantity), 0);
+        if (totalPrice <= 0) {
+            return res.redirect("/cart?error=Order processing blocked due to structural calculation errors.");
+        }
+
+        // --- HIGH-PERFORMANCE TRANSACTIONS VIA BULKWRITE ---
+        const bulkUpdateOperations = items.map(item => ({
+            updateOne: {
+                filter: { _id: item.book },
+                update: { 
+                    $inc: { 
+                        stock: -item.quantity, 
+                        salesCount: item.quantity 
+                    } 
+                }
+            }
         }));
-        
-        totalPrice = items.reduce((sum, i) => sum + i.priceAtPurchase * i.quantity, 0);
 
-        // **PENTING: Jangan hapus keranjang sesi di sini dulu, kita butuh datanya untuk update salesCount**
-        // req.session.cart = []; // Kita pindahkan ini ke bawah
-    }
-    
-    if (totalPrice <= 0) {
-        return res.redirect("/cart?error=zero-price"); 
-    }
-
-    // ==========================================================
-    // 🔥🔥 BAGIAN BARU: UPDATE SALES COUNT 🔥🔥
-    // ==========================================================
-
-    const bulkUpdateOperations = items.map(item => ({
-        updateOne: {
-            filter: { _id: item.book },
-            // $inc digunakan untuk menaikkan nilai field yang ada
-            update: { $inc: { salesCount: item.quantity } } 
-            // Kita naikkan salesCount sejumlah quantity buku yang dibeli
+        if (bulkUpdateOperations.length > 0) {
+            await Book.bulkWrite(bulkUpdateOperations);
         }
-    }));
 
-    // Gunakan Book.bulkWrite untuk update semua buku dalam satu operasi batch
-    if (bulkUpdateOperations.length > 0) {
-        await Book.bulkWrite(bulkUpdateOperations);
-    }
-    
-    // ==========================================================
-    // 🔥🔥 END OF UPDATE SALES COUNT 🔥🔥
-    // ==========================================================
-
-    // Jika order berhasil, baru hapus keranjang sesi
-    if (isBuyNow !== "true") {
-         req.session.cart = [];
-    }
-
-    // Buat Order baru dengan semua field REQUIRED
-    const newOrder = await Order.create({
-        user: user.id,
-        items,
-        totalPrice,
-        paymentMethod,
-        shippingAddress: {
-            street: user.address.street,
-            city: user.address.city,
-            province: user.address.province,
-            postalCode: user.address.postalCode,
-            phone: user.phone
+        // Menentukan label status awal pesanan berdasarkan jenis metode pembayaran pilihan konsumen
+        let initialOrderStatus = "Pending Payment";
+        if (paymentMethod === "Cash") {
+            initialOrderStatus = "Pending Pickup";
+        } else if (paymentMethod === "COD") {
+            initialOrderStatus = "Pending Delivery";
         }
-    });
 
-    res.redirect(`/order-success/${newOrder._id}`);
+        const holdExpiryDate = new Date();
+        holdExpiryDate.setHours(holdExpiryDate.getHours() + 24);
+
+        // PERBAIKAN KRITIKAL: Memastikan instansiasi User ID dikonversi secara eksplisit ke dalam tipe ObjectId Mongoose
+        const mongooseUserId = new mongoose.Types.ObjectId(user.id);
+
+        // Memasukkan dokumen transaksi baru ke pangkalan data MongoDB secara aman
+        const newOrder = await Order.create({
+            user: mongooseUserId,
+            items,
+            totalPrice,
+            paymentMethod: paymentMethod || "Cash",
+            pickupDetails: {
+                pickupStore: "Litera Main HQ Branch",
+                reservationExpiry: holdExpiryDate
+            },
+            status: initialOrderStatus
+        });
+
+        // Bersihkan memori basket session setelah dokumen order berhasil persisten di database
+        req.session.cart = [];
+
+        // Redirect langsung menuju endpoint halaman sukses order komersial baru
+        res.redirect(`/order-success/${newOrder._id}`);
+    } catch (err) {
+        console.error("Critical order processing operation exception inside backend core:", err);
+        res.status(500).send("Critical database runtime exception creating order reservation.");
+    }
 };

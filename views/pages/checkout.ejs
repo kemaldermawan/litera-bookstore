@@ -1,133 +1,268 @@
 <%- include('../partials/navbar') %>
 
-<div class="container mt-5">
-    <div class="row g-5">
-
-        <!-- LEFT SIDE -->
-        <div class="col-md-7">
-            <h2 class="mb-4">Detail Checkout</h2>
-
-            <form action="/checkout" method="POST" id="checkoutForm">
-
-                <!-- Hidden input untuk Buy Now -->
-                <% if (isBuyNow) { %>
-                    <input type="hidden" name="isBuyNow" value="true">
-                    <input type="hidden" name="bookId" value="<%= items[0].id %>">
-                <% } else { %>
-                    <input type="hidden" name="isBuyNow" value="false">
-                <% } %>
-
-                <!-- ADDRESS CARD -->
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="card-title">Alamat Pengiriman</h5>
-
-                        <% const emptyAddress = !user.address || !user.address.city || !user.phone; %>
-
-                        <% if (emptyAddress) { %>
-                            <p class="text-danger">Alamat atau No. HP belum lengkap.</p>
-                            <a href="/profile" class="btn btn-sm btn-primary rounded-pill">Lengkapi Profil</a>
-                        <% } else { %>
-                            <p class="mb-1"><strong><%= user.username %></strong></p>
-                            <p class="text-muted mb-1">
-                                <%= user.address.street %>,
-                                <%= user.address.city %>,
-                                <%= user.address.province %> -
-                                <%= user.address.postalCode %>
-                            </p>
-                            <a href="/profile" class="small text-decoration-none">Ubah Alamat</a>
-                        <% } %>
-                    </div>
-                </div>
-
-                <!-- PAYMENT -->
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-3">Metode Pembayaran</h5>
-
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" value="COD" checked>
-                            <label class="form-check-label">Cash on Delivery (COD)</label>
-                        </div>
-
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" value="Bank Transfer">
-                            <label class="form-check-label">Bank Transfer</label>
-                        </div>
-
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="paymentMethod" value="E-Wallet">
-                            <label class="form-check-label">E-Wallet</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-grid gap-2 d-md-none mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg rounded-pill">Buat Pesanan</button>
-                </div>
-
-            </form>
+<div class="container checkout-infrastructure mb-5" style="margin-top: 24px;">
+    
+    <div class="row mb-4 border-bottom pb-2">
+        <div class="col-12">
+            <h2 class="fw-bold text-dark mb-1">Checkout</h2>
+            <p class="text-muted mb-0">Please verify your delivery details, adjust item quantities, and choose your preferred local payment gateway</p>
         </div>
+    </div>
 
-        <!-- RIGHT SIDE -->
-        <div class="col-md-5">
-            <div class="card shadow-sm border-0 position-sticky" style="top: 100px;">
-                <div class="card-body p-4">
+    <% 
+      const isBuyNowMode = (typeof isBuyNow !== 'undefined' && isBuyNow === true);
+      const isProfileDataIncomplete = !user || !user.phone || !user.address || !user.address.street || !user.address.city; 
+    %>
 
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">Pesanan Anda</h5>
-                        <% if (!isBuyNow) { %>
-                            <a href="/cart" class="small text-decoration-none">Edit Keranjang</a>
+    <form action="/checkout" method="POST" id="checkoutForm">
+        
+        <% if (isBuyNowMode) { %>
+            <input type="hidden" name="isBuyNow" value="true">
+            <input type="hidden" name="bookId" value="<%= items[0].id %>">
+        <% } else { %>
+            <input type="hidden" name="isBuyNow" value="false">
+        <% } %>
+
+        <div class="row g-4">
+            
+            <div class="col-lg-7">
+                
+                <div class="card shadow-sm border mb-4 p-3 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="bi bi-geo-alt-fill text-primary me-2"></i>Delivery Address
+                        </h5>
+
+                        <% if (isProfileDataIncomplete) { %>
+                            <div class="alert alert-warning border-0 rounded shadow-sm p-3 small mb-0" role="alert">
+                                <div class="d-flex gap-2">
+                                    <i class="bi bi-exclamation-triangle-fill fs-5 text-warning"></i>
+                                    <div>
+                                        <h6 class="fw-bold alert-heading mb-1">Delivery Information Incomplete</h6>
+                                        <p class="mb-2 text-secondary">Your telephone number or physical street components are currently missing from your account ledger.</p>
+                                        <a href="/auth/profile/edit" class="btn btn-sm btn-warning fw-bold rounded-pill px-3">
+                                            <i class="bi bi-pencil-square me-1"></i>Complete Profile Address
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <div class="p-3 bg-light rounded border">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="fw-bold text-dark mb-0"><%= user.username %></h6>
+                                    <span class="badge bg-secondary rounded-pill font-sm px-2">Primary Address</span>
+                                </div>
+                                <p class="text-dark small mb-1"><i class="bi bi-telephone me-2 text-muted"></i><%= user.phone %></p>
+                                <p class="text-secondary small mb-0 lh-base">
+                                    <i class="bi bi-building me-2 text-muted"></i><%= user.address.street %>, <%= user.address.city %>, <%= user.address.postalCode || '' %>
+                                </p>
+                            </div>
+                            <div class="text-end mt-2">
+                                <a href="/auth/profile/edit" class="text-primary text-decoration-none small font-sm fw-semibold">
+                                    Change Address <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border p-3 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="bi bi-wallet2 text-primary me-2"></i>Payment Method
+                        </h5>
+                        
+                        <h6 class="fw-bold text-secondary small text-uppercase mb-3">E-Wallet (Instant Verification)</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="p-3 border rounded w-100 d-block cursor-pointer hover-border-primary transition-all bg-light">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="payGoPay" value="GoPay" checked>
+                                        <span class="form-check-label fw-bold text-dark d-block mb-0">GoPay</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="p-3 border rounded w-100 d-block cursor-pointer hover-border-primary transition-all bg-light">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="payOVO" value="OVO">
+                                        <span class="form-check-label fw-bold text-dark d-block mb-0">OVO</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="p-3 border rounded w-100 d-block cursor-pointer hover-border-primary transition-all bg-light">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="payDana" value="Dana">
+                                        <span class="form-check-label fw-bold text-dark d-block mb-0">Dana</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold text-secondary small text-uppercase mb-3">Virtual Account Transfer</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="p-3 border rounded w-100 d-block cursor-pointer hover-border-primary transition-all bg-light">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="payBCA" value="BCA Virtual Account">
+                                        <span class="form-check-label fw-bold text-dark d-block mb-0">BCA Virtual Account</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="p-3 border rounded w-100 d-block cursor-pointer hover-border-primary transition-all bg-light">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="payMandiri" value="Mandiri Virtual Account">
+                                        <span class="form-check-label fw-bold text-dark d-block mb-0">Mandiri Virtual Account</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold text-secondary small text-uppercase mb-3">Pay on Delivery / Pickup</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="p-3 border rounded w-100 d-block cursor-pointer hover-border-primary transition-all bg-light">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="payCOD" value="COD">
+                                        <span class="form-check-label fw-bold text-dark d-block mb-1">Cash on Delivery (COD)</span>
+                                        <span class="text-muted small d-block font-sm">Pay cash directly to the courier upon book arrival</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="p-3 border rounded w-100 d-block cursor-pointer hover-border-primary transition-all bg-light">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="payCash" value="Cash">
+                                        <span class="form-check-label fw-bold text-dark d-block mb-1">Cash on Pickup</span>
+                                        <span class="text-muted small d-block font-sm">Pay directly at Litera Bookstore counter</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-5">
+                <div class="p-4 bg-white border rounded shadow-sm sticky-top" style="top: 100px; z-index: 10;">
+                    <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">Review Items</h5>
+                    
+                    <div class="max-height-container mb-4 pe-1">
+                        <% if (typeof items !== 'undefined' && items && items.length > 0) { %>
+                            <% items.forEach(item => { %>
+                                <div class="d-flex align-items-center mb-3 border-bottom pb-3 item-checkout-row" data-id="<%= item.id %>">
+                                    <img src="<%= item.coverImage %>" alt="<%= item.title %>" class="rounded border me-3 bg-light" style="width: 50px; height: 68px; object-fit: cover;">
+                                    <div class="text-truncate flex-grow-1">
+                                        <h6 class="fw-bold text-dark small text-truncate mb-1" title="<%= item.title %>"><%= item.title %></h6>
+                                        <span class="text-danger fw-semibold small d-block mb-2">Rp <%= item.price.toLocaleString('id-ID') %></span>
+                                        
+                                        <div class="input-group input-group-sm" style="width: 100px;">
+                                            <input type="number" 
+                                                   name="qty[<%= item.id %>]" 
+                                                   class="form-control text-center fw-bold checkout-qty-input" 
+                                                   value="<%= item.quantity %>" 
+                                                   min="1" 
+                                                   data-price="<%= item.price %>"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <div class="text-end ps-2 align-self-end mb-1">
+                                        <span class="fw-bold text-dark small row-item-total">
+                                            Rp <%= (item.price * item.quantity).toLocaleString('id-ID') %>
+                                        </span>
+                                    </div>
+                                </div>
+                            <% }) %>
                         <% } %>
                     </div>
 
-                    <!-- ITEMS LIST -->
-                    <ul class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;">
-                        <% items.forEach(item => { %>
-                            <li class="list-group-item d-flex align-items-center px-0">
-                                <img src="<%= item.coverImage %>" 
-                                    style="width: 50px; height: 75px; object-fit: cover; border-radius: 4px;" 
-                                    class="me-3">
-
-                                <div class="me-auto">
-                                    <div class="fw-bold"><%= item.title %></div>
-                                    <small class="text-muted">Qty: <%= item.quantity %></small>
-                                </div>
-
-                                <span class="fw-bold">Rp <%= item.price.toLocaleString('id-ID') %></span>
-                            </li>
-                        <% }) %>
-                    </ul>
-
-                    <!-- SUMMARY -->
-                    <ul class="list-group list-group-flush summary-list mt-3">
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            Subtotal
-                            <strong>Rp <%= subtotal.toLocaleString('id-ID') %></strong>
+                    <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">Order Summary</h5>
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent text-secondary small">
+                            Subtotal Books
+                            <span class="text-dark fw-semibold" id="checkoutSubtotalDisplay">Rp <%= subtotal.toLocaleString('id-ID') %></span>
                         </li>
-
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            Biaya Pengiriman
-                            <span class="text-success">Gratis</span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent text-secondary small">
+                            Handling Fee
+                            <span class="text-success fw-bold text-uppercase">Free</span>
                         </li>
-
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 fs-5 fw-bold border-top pt-3">
-                            Total
-                            <strong>Rp <%= subtotal.toLocaleString('id-ID') %></strong>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent fs-5 fw-bold border-top pt-3">
+                            Total Amount
+                            <strong class="text-danger" id="checkoutTotalDisplay">Rp <%= subtotal.toLocaleString('id-ID') %></strong>
                         </li>
                     </ul>
 
-                    <div class="d-grid mt-4 d-none d-md-block">
-                        <button type="submit" form="checkoutForm" class="btn btn-primary btn-lg rounded-pill">
-                            Buat Pesanan
-                        </button>
+                    <div class="d-grid">
+                        <% if (isProfileDataIncomplete) { %>
+                            <button type="button" class="btn btn-secondary btn-lg fw-bold rounded-pill py-2.5 fs-6 shadow-sm" disabled>
+                                Checkout Disabled <i class="bi bi-lock-fill ms-2"></i>
+                            </button>
+                        <% } else { %>
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-pill py-2.5 fs-6 shadow-sm text-white">
+                                Place Order <i class="bi bi-shield-check-fill ms-2"></i>
+                            </button>
+                        <% } %>
                     </div>
 
                 </div>
             </div>
         </div>
 
-    </div>
+    </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const qtyInputs = document.querySelectorAll('.checkout-qty-input');
+        const subtotalDisplay = document.getElementById('checkoutSubtotalDisplay');
+        const totalDisplay = document.getElementById('checkoutTotalDisplay');
+
+        function recalculateCheckoutSummary() {
+            let overallSubtotal = 0;
+            
+            document.querySelectorAll('.checkout-qty-input').forEach(input => {
+                const currentQty = parseInt(input.value) || 1;
+                const unitPrice = parseFloat(input.getAttribute('data-price')) || 0;
+                const rowTotal = currentQty * unitPrice;
+                
+                const rowTotalNode = input.closest('.item-checkout-row').querySelector('.row-item-total');
+                if (rowTotalNode) {
+                    rowTotalNode.textContent = `Rp ${rowTotal.toLocaleString('id-ID')}`;
+                }
+                
+                overallSubtotal += rowTotal;
+            });
+
+            if (subtotalDisplay) subtotalDisplay.textContent = `Rp ${overallSubtotal.toLocaleString('id-ID')}`;
+            if (totalDisplay) totalDisplay.textContent = `Rp ${overallSubtotal.toLocaleString('id-ID')}`;
+        }
+
+        qtyInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (parseInt(input.value) < 1 || !input.value) {
+                    input.value = 1;
+                }
+                recalculateCheckoutSummary();
+            });
+
+            input.addEventListener('change', () => {
+                recalculateCheckoutSummary();
+            });
+        });
+    });
+</script>
+
+<style>
+    .font-sm { font-size: 0.75rem; }
+    .checkout-infrastructure { min-height: 75vh; }
+    .max-height-container { max-height: 280px; overflow-y: auto; }
+    .hover-border-primary:hover { border-color: #0d6efd !important; background-color: #f8f9fa; }
+    .transition-all { transition: all 0.2s ease-in-out; }
+    .cursor-pointer { cursor: pointer; }
+</style>
 
 <%- include('../partials/footer') %>

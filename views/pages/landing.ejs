@@ -1,115 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Litera Bookstore</title>
-
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Litera Bookstore Ecosystem</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-         /* Warna biru muda untuk tombol outline */
-        .light-blue {
-            color: #5bc0de !important;           /* Tulisan biru muda */
-            border-color: #5bc0de !important;    /* Garis outline biru muda */
-            background-color: #ffffff !important; /* Latar putih */
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-
-        /* Efek saat hover (biar ada sedikit interaksi) */
-        .light-blue:hover {
-            background-color: #5bc0de !important; /* Isi biru muda */
-            color: #ffffff !important;            /* Tulisan putih saat hover */
-            border-color: #5bc0de !important;
-        }
-        
-        .light-orange {
-            color: #f8b26a !important;
-            border-color: #f8b26a !important;
-            background-color: #ffffff !important;
-        }
-
-        .light-orange:hover {
-            background-color: #f8b26a !important;
-            color: #ffffff !important;
-            border-color: #f8b26a !important;
-        }
-
         .gradient-text {
-            background: linear-gradient(90deg, #6ecbff, #ffb877);
+            background: linear-gradient(90deg, #0d6efd, #0dcaf0);
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
+        .hero-container {
+            margin-top: auto;
+            margin-bottom: auto;
+            padding: 60px 0;
+        }
+        .hover-scale {
+            transition: transform 0.2s ease-in-out;
+        }
+        .hover-scale:hover {
+            transform: scale(1.03);
+        }
     </style>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg bg-light border-bottom py-3">
-      <div class="container">
-        <a class="navbar-brand" href="/index">
-            <img src="/img/logo.png" alt="logo" width="100">
-        </a>
+</head>
+<body>
 
-        <div class="d-flex align-items-center ms-auto">
-          <ul class="list-unstyled d-flex mb-0 me-4">
-            <li class="ms-3">
-              <a href="#"><i class="bi bi-facebook text-dark fs-4"></i></a>
-            </li>
-            <li class="ms-3">
-              <a href="#"><i class="bi bi-instagram text-dark fs-4"></i></a>
-            </li>
-            <li class="ms-3">
-              <a href="#"><i class="bi bi-tiktok text-dark fs-4"></i></a>
-            </li>
-          </ul>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary text-uppercase" href="/">Litera</a>
+            <div class="d-flex align-items-center ms-auto gap-3">
+                <a href="https://facebook.com" target="_blank" class="text-secondary"><i class="bi bi-facebook fs-5"></i></a>
+                <a href="https://instagram.com" target="_blank" class="text-secondary"><i class="bi bi-instagram fs-5"></i></a>
+            </div>
         </div>
-      </div>
     </nav>
 
-    <header class="container py-5">
-      <div class="row align-items-center">
-        <div class="col-md-6 text-center text-md-start">
-          <h1 class="fw-bold display-5 mb-3">
-            Temukan Dunia Pengetahuan di
-            <span class="gradient-text">Litera</span>
-          </h1>
-          <p class="text-secondary mb-4">
-            Nikmati pengalaman membaca dan belajar yang lebih baik dengan akses
-            ribuan buku digital, artikel, dan sumber pengetahuan dalam satu
-            platform.
-          </p>
+    <header class="container hero-container">
+        <div class="row align-items-center g-5">
+            <div class="col-md-6 text-center text-md-start">
+                <h1 class="fw-bold display-4 text-dark mb-3">
+                    Discover Your Next Favorite Book at <span class="gradient-text">Litera</span>
+                </h1>
+                <p class="text-secondary lh-lg mb-4" style="text-align: justify;">
+                    Explore our extensive collection of physical books across all your favorite genres. From gripping fiction novels and popular comics to self-development guides and academic textbooks, we have everything you need. Order online today and experience our seamless book retail service.
+                </p>
 
-          <form class="bg-white rounded p-2">
-            <div class="row g-2">
-              <div class="col-md-5">
-                <a class="btn btn-outline-primary light-blue me-2" href="/login" title="login">Login</a>
-                <a class="btn btn-primary light-orange" href="/register" title="register">Register</a>
-              </div>
+                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-3">
+                    <a class="btn btn-outline-primary fw-bold px-5 py-2.5 rounded-pill hover-scale" href="/auth/login">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </a>
+                    <a class="btn btn-primary fw-bold px-5 py-2.5 rounded-pill shadow hover-scale text-white" href="/auth/register">
+                        Create Account
+                    </a>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="/store" class="text-muted small text-decoration-none fw-semibold">
+                        Browse Bookstore Catalog <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
             </div>
-          </form>
-        </div>
 
-        <div class="col-md-6 mt-4 mt-md-0 text-center">
-          <img
-            src="/img/landing.jpg"
-            alt="Litera Books"
-            class="img-fluid rounded"
-          />
+            <div class="col-md-6 text-center">
+                <img src="/img/landing.jpg" alt="Litera Bookstore" class="img-fluid rounded-3 shadow-lg" style="max-height: 380px; object-fit: cover;">
+            </div>
         </div>
-      </div>
     </header>
 
-    <!-- Footer -->
-    <footer class="bg-light py-3 mt-5 border-top">
-      <div class="container text-center text-secondary small">
-        &copy; 2025 Litera. All Rights Reserved.
-      </div>
+    <footer class="bg-white border-top py-3 text-center text-muted small">
+        <div class="container">
+            &copy; <%= new Date().getFullYear() %> Litera Bookstore. All rights reserved.
+        </div>
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    ></script>
-  </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

@@ -1,20 +1,90 @@
 <%- include('../partials/navbar') %>
 
-<div class="container text-center mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h1 class="display-4">Pesanan Diproses!</h1>
-            <p class="lead">Terima kasih. Pesanan Anda sedang diproses (Status: <%= order.status %>).</p>
-            <hr>
-            <h4>Detail Pesanan</h4>
+<div class="container text-center order-success-infrastructure d-flex align-items-center justify-content-center" style="margin-top: 32px; min-height: 75vh; padding-bottom: 48px;">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-8 col-lg-6">
+            
+            <div class="mb-4 animate-scale-up">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 4.5rem;"></i>
+            </div>
 
-            <p><strong>Nomor Order:</strong> <%= order._id %></p>
-            <p><strong>Total Pembayaran:</strong> Rp <%= order.totalPrice.toLocaleString() %></p>
-            <p><strong>Metode Pembayaran:</strong> <%= order.paymentMethod %></p>
+            <h1 class="fw-bold text-dark mb-2 animate-fade-in">Order Placed Successfully!</h1>
+            <p class="lead text-muted mb-4 fs-6 animate-fade-in">Thank you for shopping at Litera. Your order has been registered and is currently being processed</p>
+            
+            <div class="mb-4 animate-fade-in">
+                <span class="badge bg-success font-sm rounded-pill px-4 py-2 text-uppercase shadow-sm">
+                    Status: <%= order.status %>
+                </span>
+            </div>
+            
+            <div class="card shadow-sm border p-4 mb-4 bg-white text-start rounded animate-fade-in">
+                <div class="card-body p-1">
+                    <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">Order Summary</h5>
+                    
+                    <div class="vstack gap-3 text-secondary small">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Order ID</span>
+                            <strong class="text-dark font-monospace small"><%= order._id %></strong>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Payment Method</span>
+                            <strong class="text-dark fw-semibold"><%= order.paymentMethod %></strong>
+                        </div>
 
-            <a href="/" class="btn btn-primary mt-4 rounded-pill text-white">Kembali ke Toko</a>
+                        <% if (order.paymentMethod === 'Cash' && order.pickupDetails) { %>
+                            <div class="p-3 bg-light rounded border border-dashed mt-1">
+                                <h6 class="fw-bold text-dark small mb-1"><i class="bi bi-shop me-2 text-primary"></i>Store Pickup Information</h6>
+                                <p class="text-muted font-sm mb-0 lh-base">
+                                    Location: <strong><%= order.pickupDetails.pickupStore || 'Litera Main HQ Branch' %></strong><br>
+                                    Hold Expiry: <span class="text-danger fw-semibold"><%= new Date(order.pickupDetails.reservationExpiry).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+                                </p>
+                            </div>
+                        <% } %>
+                        
+                        <div class="d-flex justify-content-between align-items-center border-top pt-3 fs-6 fw-bold">
+                            <span class="text-dark">Total Paid</span>
+                            <strong class="text-danger">Rp <%= order.totalPrice.toLocaleString('id-ID') %></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center animate-fade-in">
+                <a href="/" class="btn btn-primary btn-md fw-bold rounded-pill px-4 py-2 shadow-sm text-white me-sm-2">
+                    Back to Bookstore
+                </a>
+                <a href="/auth/profile" class="btn btn-outline-secondary btn-md fw-bold rounded-pill px-4 py-2">
+                    Track My Order <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
         </div>
     </div>
 </div>
+
+<style>
+    .font-sm { font-size: 0.75rem; }
+    .order-success-infrastructure { min-height: 75vh; }
+    .border-dashed { border-style: dashed !important; }
+    
+    /* CSS Animasi Struktur Transisi */
+    .animate-scale-up {
+        animation: executeScaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .animate-fade-in {
+        opacity: 0;
+        animation: executeFadeIn 0.4s ease-out 0.2s forwards;
+    }
+
+    @keyframes executeScaleUp {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes executeFadeIn {
+        0% { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+</style>
 
 <%- include('../partials/footer') %>

@@ -1,126 +1,193 @@
 const Book = require('../models/Book');
-const path = require('path');
-const Order = require("../models/Order");
-const Review = require("../models/Review");
-const User = require('../models/User'); // Pastikan User model diimpor untuk populate
+const Order = require('../models/Order');
+const Review = require('../models/Review');
 
-module.exports = {
+/**
+ * Render the main administrative dashboard.
+ * Compiles all registered books within the physical store inventory.
+ */
+exports.getDashboard = async (req, res) => {
+    try {
+        const books = await Book.find().lean();
+        const adminData = req.session.user || null;
 
-    // -----------------------------------------------------
-    // A. FUNGSI UTAMA (Manajemen Buku)
-    // -----------------------------------------------------
+        res.render('admin/dashboard', { 
+            pageTitle: 'Admin Dashboard - Litera Bookstore',
+            books,
+            currentUser: adminData,
+            user: adminData
+        });
+    } catch (err) {
+        console.error('Critical failure loading administrative dashboard:', err);
+        res.status(500).send('Administrative compilation failure. Failed to load dashboard.');
+    }
+};
 
-    // Dashboard - Menampilkan daftar buku dan halaman admin utama
-    getDashboard: async (req, res) => {
-        try {
-            const books = await Book.find().lean();
-            // Asumsi file EJS Anda ada di views/admin/dashboard.ejs
-            res.render('admin/dashboard', { books });
-        } catch (err) {
-            console.error("Error loading dashboard:", err);
-            res.status(500).send("Gagal memuat dashboard.");
-        }
-    },
-
-    // Form edit
-    getEditBook: async (req, res) => {
+/**
+ * Render the asset data editor workspace form interface.
+ */
+exports.getEditBook = async (req, res) => {
+    try {
         const book = await Book.findById(req.params.id).lean();
-        res.render('admin/editBook', { book });
-    },
-
-    // Create Book
-    createBook: async (req, res) => {
-        try {
-            const { judul, penulis, sinopsis, harga, stok, kategori } = req.body;
-
-            let coverPath = "/img/covers/default.jpg";
-
-            if (req.file) {
-                coverPath = "/img/covers/" + req.file.filename;
-            }
-
-            await Book.create({
-                title: judul,
-                author: penulis,
-                synopsis: sinopsis,
-                price: harga,
-                stock: stok,
-                category: kategori,
-                coverImage: coverPath
-            });
-
-            res.redirect('/admin/books');
-        } catch (err) {
-            console.log(err);
-            res.status(500).send("Error creating book");
+        if (!book) {
+            return res.redirect('/admin/dashboard?error=Target book profile not found.');
         }
-    },
 
-    // Update Book
-    updateBook: async (req, res) => {
-        try {
-            const { judul, penulis, sinopsis, harga, stok, kategori } = req.body;
+        res.render('admin/editBook', { 
+            pageTitle: `Edit: ${book.title} - Litera Admin`,
+            book 
+        });
+    } catch (err) {
+        console.error('Error fetching book target for editing workspace:', err);
+        res.redirect('/admin/dashboard?error=Runtime operational exception.');
+    }
+};
 
-            const updatedData = {
-                title: judul,
-                author: penulis,
-                synopsis: sinopsis,
-                price: harga,
-                stock: stok,
-                category: kategori,
-            };
-
-            if (req.file) {
-                updatedData.coverImage = "/img/covers/" + req.file.filename;
-            }
-
-            await Book.findByIdAndUpdate(req.params.id, updatedData);
-
-            res.redirect('/admin/books');
-        } catch (err) {
-            console.log(err);
-            res.status(500).send("Error updating book");
+/**
+ * Process inbound form payloads to register a brand-new book asset inside MongoDB.
+ */
+exports.createBook = async (req, res) => {
+    try {
+        const { title, author, synopsis, price, stock, category } = req.body;
+        
+        let coverPath = '/img/covers/default.jpg';
+        if (req.file) {
+            coverPath = `/img/covers/${req.file.filename}`;
         }
-    },
 
-    // Delete
-    deleteBook: async (req, res) => {
-        await Book.findByIdAndDelete(req.params.id);
-        res.redirect('/admin/books');
-    },
+        await Book.create({
+            title,
+            author,
+            synopsis,
+            price: Number(price),
+            stock: Number(stock),
+            category,
+            coverImage: coverPath
+        });
 
-    // -----------------------------------------------------
-    // B. FUNGSI DATA DINAMIS (Untuk AJAX)
-    // -----------------------------------------------------
+        res.redirect('/admin/dashboard?success=New book asset deployed to shelves successfully.');
+    } catch (err) {
+        console.error('Critical book asset creation failure sequence:', err);
+        res.status(500).send('Internal Server Error creating inventory record.');
+    }
+};
 
-    // 1. Ambil data Transaksi
-    getTransactions: async (req, res) => {
-        try {
-            const transactions = await Order.find({})
-                .populate('user', 'username') // Mengambil username
-                .sort({ createdAt: -1 });
+/**
+ * Process configuration updates for an existing book catalog record item.
+ */
+exports.updateBook = async (req, res) => {
+    try {
+        const { title, author, synopsis, price, stock, category } = req.body;
+        
+        const updatedData = {
+            title,
+            author,
+            synopsis,
+            price: Number(price),
+            stock: Number(stock),
+            category
+        };
 
-            // Mengirim data sebagai JSON untuk diolah JS di frontend
-            res.json({ success: true, transactions });
-        } catch (error) {
-            console.error("Error fetching transactions:", error);
-            res.status(500).json({ success: false, message: "Gagal memuat data transaksi." });
+        if (req.file) {
+            updatedData.coverImage = `/img/covers/${req.file.filename}`;
         }
-    },
 
-    // 2. Ambil data Review
-    getReviews: async (req, res) => {
-        try {
-            const reviews = await Review.find({})
-                .populate('user', 'username') // Mengambil username
-                .populate('book', 'title') // Mengambil judul buku
-                .sort({ createdAt: -1 });
-
-            // Mengirim data sebagai JSON untuk diolah JS di frontend
-            res.json({ success: true, reviews });
-        } catch (error) {
-            console.error("Error fetching reviews:", error);
-            res.status(500).json({ success: false, message: "Gagal memuat data review." });
+        const result = await Book.findByIdAndUpdate(req.params.id, updatedData);
+        if (!result) {
+            return res.redirect('/admin/dashboard?error=Failed to update. Book profile missing.');
         }
+
+        res.redirect('/admin/dashboard?success=Book configuration matrix synchronized.');
+    } catch (err) {
+        console.error('Critical exception applying book updates:', err);
+        res.status(500).send('Internal Server Error updating inventory records.');
+    }
+};
+
+/**
+ * Evict a designated book document from the library datastore collection.
+ */
+exports.deleteBook = async (req, res) => {
+    try {
+        const result = await Book.findByIdAndDelete(req.params.id);
+        if (!result) {
+            return res.redirect('/admin/dashboard?error=Deletion targeted book not found.');
+        }
+
+        res.redirect('/admin/dashboard?success=Book asset dropped from active storage.');
+    } catch (err) {
+        console.error('Critical exception executing asset deletion command:', err);
+        res.redirect('/admin/dashboard?error=Operational erasure protocol failure.');
+    }
+};
+
+// --- DYNAMIC AJAX DATA STREAM ENDPOINTS (BACKEND API FOR THE ADMIN DASHBOARD) ---
+
+/**
+ * Fetch and stream historical order reservation records to feeding AJAX tables.
+ */
+exports.getTransactions = async (req, res) => {
+    try {
+        const transactions = await Order.find({})
+            .populate('user', 'username')
+            .sort({ createdAt: -1 });
+
+        res.json({ success: true, transactions });
+    } catch (error) {
+        console.error('Error fetching structural order reservation vectors for AJAX pipeline:', error);
+        res.status(500).json({ success: false, message: 'Failed to compile transaction ledger streams.' });
+    }
+};
+
+/**
+ * Fetch and stream public user book reviews to feeding data tables.
+ */
+exports.getReviews = async (req, res) => {
+    try {
+        const reviews = await Review.find({})
+            .populate('user', 'username')
+            .populate('book', 'title')
+            .sort({ createdAt: -1 });
+
+        res.json({ success: true, reviews });
+    } catch (error) {
+        console.error('Error compiling product review feeds for AJAX pipeline:', error);
+        res.status(500).json({ success: false, message: 'Failed to extract product review stream metrics.' });
+    }
+};
+
+/**
+ * NEW ACTION: Update order status to Completed via Admin Control trigger
+ */
+exports.completeOrder = async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        const updatedOrder = await Order.findByIdAndUpdate(orderId, { status: 'Completed' }, { new: true });
+        
+        if (!updatedOrder) {
+            return res.status(404).json({ success: false, message: "Order records not found." });
+        }
+        res.status(200).json({ success: true, message: "Order finalized successfully." });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error completing order." });
+    }
+};
+
+/**
+ * NEW ACTION: Delete customer review via Admin moderation panel
+ */
+exports.deleteReview = async (req, res) => {
+    try {
+        const reviewId = req.params.id;
+        const targetReview = await Review.findByIdAndDelete(reviewId);
+        
+        if (!targetReview) {
+            return res.status(404).json({ success: false, message: "Review listing not found." });
+        }
+        res.status(200).json({ success: true, message: "Review evicted safely." });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error deleting review." });
     }
 };

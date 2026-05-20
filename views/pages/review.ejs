@@ -1,52 +1,94 @@
 <%- include('../partials/navbar') %>
 
-<style>
-    #star-rating {
-        display: flex;
-        gap: 5px;
-    }
-    #star-rating .star-icon {
-        font-size: 2rem;
-        color: #e9ecef;
-        cursor: pointer;
-        transition: color 0.2s;
-    }
-    #star-rating .star-icon:hover {
-        color: #ffd76d;
-    }
-    #star-rating .star-icon.selected {
-        color: #ffc107;
-    }
-</style>
-
-<div class="container mt-5">
+<div class="container py-5 review-generation-infrastructure" style="margin-top: 100px;">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-        <h3>Beri Ulasan untuk: <%= book.title %></h3>
-        <hr>
-        <form action="/review/<%= book._id %>" method="POST">
+        <div class="col-lg-6 col-md-8">
             
-            <div class="mb-3">
-            <label class="form-label">Rating</label>
-            <div id="star-rating">
-                <i class="bi bi-star-fill star-icon" data-value="1"></i>
-                <i class="bi bi-star-fill star-icon" data-value="2"></i>
-                <i class="bi bi-star-fill star-icon" data-value="3"></i>
-                <i class="bi bi-star-fill star-icon" data-value="4"></i>
-                <i class="bi bi-star-fill star-icon" data-value="5"></i>
+            <div class="text-center mb-4 border-bottom pb-3">
+                <h2 class="fw-bold text-dark mb-1">Submit Product Evaluation</h2>
+                <p class="text-muted">Share your academic feedback regarding: <span class="text-primary fw-semibold">"<%= book.title %>"</span></p>
             </div>
-            <input type="hidden" name="rating" id="rating-input" value="0" required>
+
+            <div class="card shadow-sm border-0 p-4 bg-white rounded-3">
+                <div class="card-body">
+                    
+                    <form action="/review/<%= book._id %>" method="POST" id="publicAssetReviewForm">
+                        
+                        <div class="mb-4 text-center bg-light p-3 rounded border">
+                            <label class="form-label d-block fw-bold text-secondary small text-uppercase mb-2">Quality Score Metrics</label>
+                            
+                            <div id="star-rating" class="d-flex justify-content-center gap-2 mb-2">
+                                <i class="bi bi-star-fill star-icon text-muted fs-3 cursor-pointer" data-value="1"></i>
+                                <i class="bi bi-star-fill star-icon text-muted fs-3 cursor-pointer" data-value="2"></i>
+                                <i class="bi bi-star-fill star-icon text-muted fs-3 cursor-pointer" data-value="3"></i>
+                                <i class="bi bi-star-fill star-icon text-muted fs-3 cursor-pointer" data-value="4"></i>
+                                <i class="bi bi-star-fill star-icon text-muted fs-3 cursor-pointer" data-value="5"></i>
+                            </div>
+                            
+                            <input type="hidden" name="rating" id="rating-input" value="0" required>
+                            <div id="ratingValidationFeedback" class="text-danger font-sm d-none mt-1">
+                                <i class="bi bi-exclamation-circle me-1"></i>Please select a valid rating score before submitting.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="comment" class="form-label fw-bold text-dark small">Written Review Comment</label>
+                            <textarea class="form-control small-placeholder" id="comment" name="comment" rows="5" placeholder="Provide factual details regarding content accuracy, compilation quality, or print durability..." required style="resize: none;"></textarea>
+                        </div>
+ 
+                        <div class="row g-3 border-top pt-3 mt-2">
+                            <div class="col-6">
+                                <a href="/store/book/<%= book._id %>" class="btn btn-outline-secondary btn-sm fw-semibold rounded-pill w-100 py-2">
+                                    Abort Review
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <button type="submit" id="submitReviewBtn" class="btn btn-primary btn-sm fw-semibold rounded-pill w-100 py-2 text-white shadow-sm">
+                                    Dispatch Review
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
             </div>
-            <div class="mb-3">
-            <label for="comment" class="form-label">Komentar Anda</label>
-            <textarea class="form-control" id="comment" name="comment" rows="4" required></textarea>
-            </div>
-            
-            <button type="submit" class="btn btn-primary rounded-pill">Kirim Ulasan</button>
-            <a href="/store/book/<%= book._id %>" class="btn btn-outline-primary rounded-pill">Batal</a>
-            </form>
+
         </div>
     </div>
 </div>
+
+<style>
+    .font-sm { font-size: 0.75rem; }
+    .small-placeholder::placeholder { font-size: 0.85rem; color: #adb5bd; }
+    .review-generation-infrastructure { min-height: 70vh; }
+    .cursor-pointer { cursor: pointer; }
+    
+    /* Interactive visual selector tokens for star matrix mapping */
+    #star-rating .star-icon {
+        transition: color 0.15s ease-in-out, transform 0.15s ease-in-out;
+    }
+    #star-rating .star-icon:hover {
+        transform: scale(1.15);
+    }
+    #star-rating .star-icon.hover {
+        color: #ffd76d !important;
+    }
+    #star-rating .star-icon.selected {
+        color: #ffc107 !important;
+    }
+</style>
+
+<script>
+    document.getElementById('publicAssetReviewForm').addEventListener('submit', function(event) {
+        const ratingValueNode = document.getElementById('rating-input').value;
+        const validationFeedbackNode = document.getElementById('ratingValidationFeedback');
+        
+        if (parseInt(ratingValueNode) === 0) {
+            event.preventDefault(); // Halt active form dispatch pipeline
+            if (validationFeedbackNode) validationFeedbackNode.classList.remove('d-none');
+        }
+    });
+</script>
 
 <%- include('../partials/footer') %>

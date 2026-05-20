@@ -1,199 +1,211 @@
 <%- include('../partials/navbar') %>
 
-<div class="container mt-4">
-    <h1 class="mb-4">Profil Saya</h1>
-
-    <% if (typeof success !== "undefined" && success) { %>
-        <div id="popup-alert" class="popup-alert" style="background: #27ae60;">
-            <%= success %>
-        </div>
-        <style>
-            .popup-alert {
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: #27ae60;
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-                font-weight: 600;
-                z-index: 9999;
-                opacity: 0;
-                animation: fadeInOut 3s ease forwards;
-            }
-
-            @keyframes fadeInOut {
-                0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-                10% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                80% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-            }
-        </style>
-        <script>
-            setTimeout(() => {
-                const p = document.getElementById('popup-alert');
-                if (p) p.remove();
-            }, 3200);
-        </script>
-    <% } %>
+<div class="container profile-infrastructure mb-5" style="margin-top: 100px; padding-bottom: 48px;">
     
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="text-center mb-4">
-                <img src="<%= user.profilePicture %>" alt="Profile Picture" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #ddd;">
-            </div>
-
-            <h5 class="card-title text-center mb-4">Informasi Akun</h5>
-            <p><strong>Username:</strong> <%= user.username %></p>
-            <p><strong>Email   :</strong> <%= user.email %></p>
-            <p><strong>No. HP  :</strong> <%= user.phone || '-' %></p>
-            
-            <% if (user.bio) { %>
-                <p><strong>Bio:</strong></p>
-                <p class="text-muted"><%= user.bio %></p>
-            <% } %>
-            
-            <hr>
-            <div class="d-flex gap-2">
-                <a href="/profile/edit" class="btn btn-primary rounded-pill">Edit Profil</a>
-                <a href="/logout" class="btn btn-danger rounded-pill btn-logout">Logout</a>
-                <button type="button" class="btn btn-outline-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                    Hapus Akun
-                </button>
-            </div>
+    <div class="row mb-4 border-bottom pb-2">
+        <div class="col-12">
+            <h2 class="fw-bold text-dark mb-1">My Profile</h2>
+            <p class="text-muted mb-0">Manage your personal information, delivery addresses, and track your orders</p>
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Alamat Pengiriman Utama</h5>
-            <form action="/profile/update-address" method="POST">
-                <div class="mb-3">
-                    <label for="street" class="form-label">Jalan</label>
-                    <input type="text" id="street" name="street" class="form-control" value="<%= user.address ? user.address.street || '' : '' %>">
+    <div class="row g-4">
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 p-4 text-center bg-white rounded-3 position-relative mb-4">
+                <div class="mb-3 position-relative d-inline-block mx-auto">
+                    <img src="<%= user.profilePicture || '/img/default-avatar.png' %>" alt="<%= user.username %>" class="rounded-circle img-thumbnail shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
                 </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="city" class="form-label">Kota</label>
-                        <input type="text" id="city" name="city" class="form-control" value="<%= user.address ? user.address.city || '' : '' %>">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="province" class="form-label">Provinsi</label>
-                        <input type="text" id="province" name="province" class="form-control" value="<%= user.address ? user.address.province || '' : '' %>">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="postalCode" class="form-label">Kode Pos</label>
-                        <input type="text" id="postalCode" name="postalCode" class="form-control" value="<%= user.address ? user.address.postalCode || '' : '' %>">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary rounded-pill">Simpan Alamat</button>
-            </form>
-        </div>
-    </div>
 
-    <h3 class="mb-3">Riwayat Transaksi</h3>
-
-    <% if (orders && orders.length > 0) { %>
-        <% orders.forEach(order => { %>
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header d-flex flex-wrap justify-content-between">
-                    <div>
-                        <strong>Pesanan ID:</strong> <small class="text-muted"><%= order._id %></small>
-                    </div>
-                    <div>
-                        <strong>Tanggal:</strong> 
-                        <%= new Date(order.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %>
-                    </div>
-                </div>
+                <h4 class="fw-bold text-dark mb-1"><%= user.username %></h4>
+                <p class="text-muted small mb-4"><%= user.email %></p>
                 
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        
-                        <% order.items.forEach(item => { %>
-                            <li class="list-group-item d-flex align-items-center py-3">
-                                
-                                <% if (item.book) { %>
-                                    <img src="<%= item.book.coverImage %>" alt="<%= item.book.title %>" style="width: 50px; height: 75px; object-fit: cover; margin-right: 15px;">
-                                    
-                                    <div class="me-auto">
-                                        <strong><%= item.book.title %></strong>
-                                        <br>
-                                        <small class="text-muted">Qty: <%= item.quantity %>, Harga Satuan: Rp <%= item.priceAtPurchase.toLocaleString('id-ID') %></small>
-                                    </div>
-                                    
-                                    <div class="ms-3 text-end">
-                                        <% 
-                                            // Asumsi: Status order disetel 'Selesai' di backend
-                                            const canReview = order.status === 'Selesai' || !order.status; 
-                                            // TODO: Tambahkan logika cek apakah item ini sudah diulas
-                                            const isReviewed = false; // Ganti dengan logika sebenarnya
-                                        %>
-                                        
-                                        <% if (isReviewed) { %>
-                                            <button class="btn btn-sm btn-success rounded-pill" disabled>Sudah Diulas</button>
-                                        <% } else if (canReview) { %>
-                                            <a href="/review/new/<%= item.book._id %>" class="btn btn-sm btn-primary rounded-pill text-white">
-                                                Tulis Ulasan
-                                            </a>
-                                        <% } %>
-                                    </div>
-                                <% } else { %>
-                                    <div class="text-danger">Item tidak valid atau buku telah dihapus.</div>
-                                <% } %>
-                            </li>
-                        <% }) %>
-                    </ul>
+                <div class="p-3 bg-light rounded text-start mb-4">
+                    <h6 class="fw-bold text-secondary font-sm text-uppercase mb-2">About Me</h6>
+                    <p class="text-secondary small mb-0 lh-base text-justify fst-italic">
+                        <%= user.bio || 'No description available.' %>
+                    </p>
                 </div>
 
-                <div class="card-footer d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>Status:</strong>
-                        <% 
-                            const status = 'Selesai'; 
-                            let statusClass = 'bg-secondary';
-                            if (status === 'Selesai') statusClass = 'bg-success';
-                            else if (status === 'Dibatalkan') statusClass = 'bg-danger';
-                            else if (status === 'Pending' || status === 'Baru') statusClass = 'bg-warning text-dark';
-                        %>
-                        <span class="badge <%= statusClass %>"><%= status %></span>
+                <div class="vstack gap-2 text-start small text-secondary mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-telephone text-primary me-3 fs-6 flex-shrink-0"></i>
+                        <span class="text-truncate"><%= user.phone || 'No phone number' %></span>
                     </div>
-                    <h5 class="mb-0">Total: <span class="text-primary fw-bold">Rp <%= order.totalPrice.toLocaleString('id-ID') %></span></h5>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-geo-alt text-primary me-3 fs-6 flex-shrink-0"></i>
+                        <span class="text-wrap">
+                            <% if (user.address && user.address.street) { %>
+                                <%= user.address.street %>, <%= user.address.city %>, <%= user.address.postalCode %>
+                            <% } else { %>
+                                No address provided
+                            <% } %>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="/auth/profile/edit" class="btn btn-primary fw-bold rounded-pill text-white shadow-sm btn-sm py-2">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                    </a>
+                    <button type="button" class="btn btn-outline-danger fw-bold rounded-pill btn-sm py-2" data-bs-toggle="modal" data-bs-target="#erasureVerificationModal">
+                        <i class="bi bi-trash3 me-2"></i>Delete Account
+                    </button>
                 </div>
             </div>
-        <% }) %>
-    <% } else { %>
-        <div class="alert alert-info text-center">
-            Anda belum memiliki riwayat transaksi. Ayo mulai berbelanja!
         </div>
-    <% } %>
 
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 p-4 bg-white rounded-3">
+                <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom">
+                    <i class="bi bi-clock-history text-primary me-2"></i>Order History
+                </h5>
+
+                <% if (typeof orders !== 'undefined' && orders && orders.length > 0) { %>
+                    <div class="vstack gap-4">
+                        <% orders.forEach(order => { %>
+                            <div class="p-3 border rounded shadow-sm bg-light-subtle">
+                                
+                                <div class="row align-items-center mb-3 border-bottom pb-2 g-2">
+                                    <div class="col-md-6 col-12">
+                                        <span class="text-muted font-sm d-block fw-semibold">Order ID</span>
+                                        <span class="font-monospace text-dark fw-bold small"><%= order._id %></span>
+                                    </div>
+                                    <div class="col-md-3 col-6 text-md-center">
+                                        <span class="text-muted font-sm d-block fw-semibold">Date</span>
+                                        <span class="text-secondary fw-semibold small">
+                                            <%= new Date(order.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+                                        </span>
+                                    </div>
+                                    <div class="col-md-3 col-6 text-md-end">
+                                        <span class="text-muted font-sm d-block fw-semibold">Status</span>
+                                        <span class="badge <%= order.status === 'Completed' ? 'bg-success' : 'bg-warning text-dark' %> font-sm rounded-pill px-3">
+                                            <%= order.status %>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="vstack gap-2 mb-3">
+                                    <span class="text-muted font-sm fw-bold d-block mb-1">Purchased Items:</span>
+                                    
+                                    <% if (order.items && order.items.length > 0) { %>
+                                        <% order.items.forEach(item => { %>
+                                            <div class="d-flex align-items-center justify-content-between p-2 bg-white border rounded shadow-sm">
+                                                <div class="d-flex align-items-center text-truncate me-3">
+                                                    <% if (item.book && item.book.coverImage) { %>
+                                                        <img src="<%= item.book.coverImage %>" alt="<%= item.book.title %>" class="rounded border me-3" style="width: 45px; height: 60px; object-fit: cover;">
+                                                    <% } else { %>
+                                                        <div class="rounded border bg-light text-muted d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 60px; font-size: 10px;">No Cover</div>
+                                                    <% } %>
+                                                    <div class="text-truncate">
+                                                        <h6 class="fw-bold text-dark text-truncate mb-1 font-sm" title="<%= item.book ? item.book.title : 'Asset Removed' %>">
+                                                            <%= item.book ? item.book.title : 'Book Removed From Catalog' %>
+                                                        </h6>
+                                                        <p class="text-muted mb-0 font-sm">
+                                                            <%= item.quantity %> item(s) &times; Rp <%= (item.priceAtPurchase || 0).toLocaleString('id-ID') %>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="text-end flex-shrink-0">
+                                                    <span class="text-dark fw-bold font-sm">
+                                                        Rp <%= ((item.priceAtPurchase || 0) * (item.quantity || 0)).toLocaleString('id-ID') %>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <p class="text-muted font-sm fst-italic mb-0">No items found for this order.</p>
+                                    <% } %>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center pt-2 border-top bg-white p-2 rounded">
+                                    <div>
+                                        <span class="text-muted font-sm d-block fw-semibold">Payment Method</span>
+                                        <span class="text-dark fw-bold font-sm">
+                                            <i class="bi bi-wallet2 me-1 text-primary"></i><%= order.paymentMethod %>
+                                        </span>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="text-muted font-sm d-block fw-semibold">Total Price</span>
+                                        <strong class="text-danger fs-6">Rp <%= order.totalPrice.toLocaleString('id-ID') %></strong>
+                                    </div>
+                                </div>
+
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                        <p class="mb-0 font-sm fst-italic">You have no order history yet.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+    </div>
 </div>
 
-<!-- Modal Konfirmasi Hapus Akun -->
-<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteAccountLabel">Hapus Akun</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="erasureVerificationModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="erasureModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-3 border-0 shadow">
+            <div class="modal-header bg-danger text-white p-3">
+                <h5 class="modal-title fw-bold fs-6" id="erasureModalLabel"><i class="bi bi-exclamation-triangle-fill me-2"></i>Delete Account</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-shadow="none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p><strong>Perhatian!</strong></p>
-                <p>Anda akan menghapus akun secara permanen. Tindakan ini tidak dapat dibatalkan dan semua data akun Anda akan hilang.</p>
-                <p class="text-muted">Apakah Anda yakin ingin melanjutkan?</p>
+            <div class="modal-body p-4 text-center">
+                <p class="text-dark fw-semibold mb-2">Are you sure you want to delete your account?</p>
+                <p class="text-muted small mb-0">This action is permanent and your account data cannot be recovered.</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <form action="/profile/delete-account" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Ya, Hapus Akun</button>
+            <div class="modal-footer p-2 bg-light d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+                <form action="/auth/profile/delete" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">Delete</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <div id="profile-success-popup" class="runtime-popup-alert-node">
+        <i class="bi bi-check-circle-fill me-2"></i><%= success %>
+    </div>
+    <style>
+        .runtime-popup-alert-node {
+            position: fixed;
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #27ae60;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            font-weight: 600;
+            z-index: 1050;
+            opacity: 0;
+            animation: executeFadeInOutProtocol 3.5s ease forwards;
+        }
+        @keyframes executeFadeInOutProtocol {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-15px); }
+            12% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            88% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-15px); }
+        }
+    </style>
+    <script>
+        setTimeout(() => {
+            const operationalAlertNode = document.getElementById('profile-success-popup');
+            if (operationalAlertNode) operationalAlertNode.remove();
+        }, 3700);
+    </script>
+<% } %>
+
+<style>
+    .font-sm { font-size: 0.75rem; }
+    .profile-infrastructure { min-height: 80vh; }
+    .text-justify { text-align: justify; }
+</style>
 
 <%- include('../partials/footer') %>

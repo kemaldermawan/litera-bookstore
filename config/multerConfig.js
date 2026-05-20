@@ -13,22 +13,21 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req, file, cb) => {
     const allowedFileTypes = /jpeg|jpg|png|gif|webp/;
-
     const extname = allowedFileTypes.test(path.extname(file.originalname).toLowerCase());
-
     const mimetype = allowedFileTypes.test(file.mimetype);
 
     if (mimetype && extname) {
         return cb(null, true);
     } else {
-        cb(new Error('Error: Hanya file gambar (jpeg, jpg, png, gif, webp) yang diizinkan!'), false);
+        // PERBAIKAN: Mengubah pesan galat ke dalam Bahasa Inggris profesional
+        cb(new Error('Error: Only image files (jpeg, jpg, png, gif, webp) are allowed!'), false);
     }
 };
 
 const upload = multer({
     storage: storage,
     limits: {
-        // fileSize: 1024 * 1024 * 5
+        fileSize: 5 * 1024 * 1024 // Enforce strict 5MB maximum file size capacity limit
     },
     fileFilter: fileFilter
 });
