@@ -11,8 +11,16 @@ const BookSchema = new Schema({
     category: { 
         type: String, 
         required: true,
-        // List genre baru yang sudah disempurnakan dan saling melengkapi
-        enum: ['Fiction', 'Non-Fiction', 'Technology & Science', 'Comic & Graphic Novel', 'Biography & History', 'Children & Young Adult', 'Textbook & Education']
+        enum: [
+            'Fiction', 
+            'Non-Fiction', 
+            'Self-Development', 
+            'Technology & Science', 
+            'Comic & Graphic Novel', 
+            'Biography & History', 
+            'Children & Young Adult', 
+            'Textbook & Education'
+        ]
     },
     salesCount: { type: Number, default: 0 },
     averageRating: { type: Number, default: 0 },

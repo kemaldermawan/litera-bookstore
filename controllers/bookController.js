@@ -4,17 +4,33 @@ const Order = require('../models/Order');
 
 /**
  * Fetch and aggregate book collections for the main bookstore storefront.
+ * Compiles all 8 structural categories along with new arrivals and bestsellers.
  */
 exports.getAllBooks = async (req, res) => {
     try {
-        const [newArrivals, bestsellers, fiction, nonFiction, technology, comic, biography] = await Promise.all([
+        // Sinkronisasi Ekspansi: Menampung seluruh 8 genre resmi dari MongoDB cluster
+        const [
+            newArrivals, 
+            bestsellers, 
+            fiction, 
+            nonFiction, 
+            selfDevelopment, 
+            technology, 
+            comic, 
+            biography,
+            children,
+            textbook
+        ] = await Promise.all([
             Book.find({}).sort({ createdAt: -1 }).limit(5).lean(),
             Book.find({ salesCount: { $gt: 0 } }).sort({ salesCount: -1 }).limit(5).lean(),
-            Book.find({ genre: { $regex: '^Fiction$', $options: 'i' } }).limit(5).lean(),
-            Book.find({ genre: { $regex: '^Non-Fiction$', $options: 'i' } }).limit(5).lean(),
-            Book.find({ genre: { $regex: '^Technology & Science$', $options: 'i' } }).limit(5).lean(),
-            Book.find({ genre: { $regex: '^Comic & Graphic Novel$', $options: 'i' } }).limit(5).lean(),
-            Book.find({ genre: { $regex: '^Biography & History$', $options: 'i' } }).limit(5).lean()
+            Book.find({ category: { $regex: '^Fiction$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ category: { $regex: '^Non-Fiction$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ category: { $regex: '^Self-Development$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ category: { $regex: '^Technology & Science$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ category: { $regex: '^Comic & Graphic Novel$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ category: { $regex: '^Biography & History$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ category: { $regex: '^Children & Young Adult$', $options: 'i' } }).limit(5).lean(),
+            Book.find({ category: { $regex: '^Textbook & Education$', $options: 'i' } }).limit(5).lean()
         ]);
 
         const success = req.session ? req.session.success : null;
@@ -30,15 +46,19 @@ exports.getAllBooks = async (req, res) => {
             bestsellers,
             fiction,
             nonFiction,
+            selfDevelopment, 
             technology,
             comic,
             biography,
+            children,
+            textbook,
+            user: req.session.user || null,
             success,
             error
         });
     } catch (err) {
-        console.error('Critical catalogue aggregation failure:', err);
-        res.status(500).send('Internal Server Error loading catalog records.');
+        console.error('Critical failure loading bookstore storefront categories:', err);
+        res.status(500).send('Internal Server Error compiling storefront catalog views.');
     }
 };
 
@@ -66,7 +86,6 @@ exports.getBookDetail = async (req, res) => {
             _id: { $ne: book._id }
         }).limit(4).lean();
 
-        // VALIDASI EMPIRIS: Memeriksa apakah user aktif sudah pernah membeli buku ini sampai sukses
         let hasPurchased = false;
         if (sessionUser && sessionUser.role === 'user') {
             const completedOrder = await Order.findOne({

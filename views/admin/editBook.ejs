@@ -57,11 +57,14 @@
                     <input type="number" class="form-control" id="stock" name="stock" min="0" value="<%= book.stock %>" placeholder="e.g., 10" required>
                 </div>
 
-                <div class="col-md-3 col-6">
-                    <label for="category" class="form-label small fw-bold">Genre / Category</label>
-                    <select id="category" class="form-select fw-medium" name="category" required>
+                <div class="col-md-6">
+                    <label for="category" class="form-label small fw-bold">Book Category / Genre</label>
+                    <select class="form-select" id="category" name="category" required>
                         <option value="Fiction" <%= book.category === 'Fiction' ? 'selected' : '' %>>Fiction</option>
                         <option value="Non-Fiction" <%= book.category === 'Non-Fiction' ? 'selected' : '' %>>Non-Fiction</option>
+                        
+                        <option value="Self-Development" <%= book.category === 'Self-Development' ? 'selected' : '' %>>Self-Development</option>
+                        
                         <option value="Technology & Science" <%= book.category === 'Technology & Science' ? 'selected' : '' %>>Technology & Science</option>
                         <option value="Comic & Graphic Novel" <%= book.category === 'Comic & Graphic Novel' ? 'selected' : '' %>>Comic & Graphic Novel</option>
                         <option value="Biography & History" <%= book.category === 'Biography & History' ? 'selected' : '' %>>Biography & History</option>

@@ -90,7 +90,7 @@
                                     
                                     <% if (order.items && order.items.length > 0) { %>
                                         <% order.items.forEach(item => { %>
-                                            <div class="d-flex align-items-center justify-content-between p-2 bg-white border rounded shadow-sm">
+                                            <div class="d-flex align-items-center justify-content-between p-2 bg-white border rounded shadow-sm mb-2">
                                                 <div class="d-flex align-items-center text-truncate me-3">
                                                     <% if (item.book && item.book.coverImage) { %>
                                                         <img src="<%= item.book.coverImage %>" alt="<%= item.book.title %>" class="rounded border me-3" style="width: 45px; height: 60px; object-fit: cover;">
@@ -106,13 +106,21 @@
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div class="text-end flex-shrink-0">
-                                                    <span class="text-dark fw-bold font-sm">
-                                                        Rp <%= ((item.priceAtPurchase || 0) * (item.quantity || 0)).toLocaleString('id-ID') %>
-                                                    </span>
+                                                
+                                                <div class="d-flex align-items-center gap-3 flex-shrink-0">
+                                                    <div class="text-end d-none d-sm-block">
+                                                        <span class="text-dark fw-bold font-sm">
+                                                            Rp <%= ((item.priceAtPurchase || 0) * (item.quantity || 0)).toLocaleString('id-ID') %>
+                                                        </span>
+                                                    </div>
+                                                    <% if (order.status === 'Completed' && item.book) { %>
+                                                        <a href="/review/<%= item.book._id %>" class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3 font-sm shadow-sm transition-all">
+                                                            <i class="bi bi-star-fill me-1"></i>Tulis Review
+                                                        </a>
+                                                    <% } %>
                                                 </div>
                                             </div>
-                                        <% }) %>
+                                        <% }); %>
                                     <% } else { %>
                                         <p class="text-muted font-sm fst-italic mb-0">No items found for this order.</p>
                                     <% } %>
