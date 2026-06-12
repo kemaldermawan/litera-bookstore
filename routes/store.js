@@ -8,7 +8,6 @@ const Book = require('../models/Book');
 const Order = require('../models/Order');
 const { isLoggedIn, mustCompleteProfile } = require('../middleware/auth');
 
-// --- 1. PROTOKOL RUTE SUKSES ORDER ---
 router.get('/order-success/:id', isLoggedIn, async (req, res) => {
     try {
         const orderId = req.params.id;
@@ -30,23 +29,19 @@ router.get('/order-success/:id', isLoggedIn, async (req, res) => {
     }
 });
 
-// --- 2. BOOK CATALOG INTERFACE ENDPOINTS ---
 router.get('/', (req, res) => res.redirect('/store'));
 router.get('/store', bookController.getAllBooks);
 router.get('/store/book/:id', bookController.getBookDetail);
 router.get('/search', bookController.searchBooks);
 
-// --- 3. SHOPPING BASKET ROUTING PROTOCOLS ---
 router.get('/cart', cartController.getCart);
 router.post('/cart/add/:id', cartController.addToCart);
 router.post('/cart/update', cartController.updateCart);
 router.get('/cart/delete/:id', cartController.deleteItem);
 
-// --- 4. CLICK & COLLECT IN-STORE CHECKOUT PROTOCOLS ---
 router.get('/checkout', isLoggedIn, mustCompleteProfile, checkoutController.checkoutCart);
 router.post('/checkout', isLoggedIn, mustCompleteProfile, checkoutController.createOrder);
 
-// --- 5. PUBLIC PRODUCT REVIEW WORKFLOWS (DEDICATED INTERFACE INTEGRATION) ---
 router.get('/review/:id', isLoggedIn, async (req, res) => {
     try {
         const bookId = req.params.id;
@@ -57,7 +52,6 @@ router.get('/review/:id', isLoggedIn, async (req, res) => {
             return res.redirect('/auth/profile?error=Asset profile not found.');
         }
 
-        // Proteksi Gerbang Keamanan: Validasi kepemilikan transaksi faktur 'Completed' sebelum merender form
         const verifiedPurchase = await Order.findOne({
             user: sessionUser.id,
             status: 'Completed',
@@ -66,6 +60,15 @@ router.get('/review/:id', isLoggedIn, async (req, res) => {
 
         if (!verifiedPurchase) {
             return res.redirect(`/store/book/${bookId}?error=Review operational authorization restricted.`);
+        }
+
+        const existingReview = await Review.findOne({
+            user: sessionUser.id,
+            book: bookId
+        }).lean();
+
+        if (existingReview) {
+            return res.redirect(`/store/book/${bookId}`);
         }
 
         res.render('pages/review', { 
@@ -81,9 +84,19 @@ router.get('/review/:id', isLoggedIn, async (req, res) => {
 
 router.post('/review/:id', isLoggedIn, async (req, res) => {
     try {
-        const { rating, comment } = req.body;
         const bookId = req.params.id;
         const sessionUser = req.session.user; 
+
+        const existingReview = await Review.findOne({
+            user: sessionUser.id,
+            book: bookId
+        }).lean();
+
+        if (existingReview) {
+            return res.redirect(`/store/book/${bookId}`);
+        }
+
+        const { rating, comment } = req.body;
 
         const newReview = new Review({
             book: bookId,

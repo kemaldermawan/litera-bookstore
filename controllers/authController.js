@@ -1,9 +1,5 @@
 const User = require('../models/User');
 
-/**
- * Render the Login page interface.
- * Captures query notifications regarding account deletion or logging out.
- */
 exports.getLogin = (req, res) => {
     try {
         const deleted = req.query.deleted || undefined;
@@ -23,15 +19,10 @@ exports.getLogin = (req, res) => {
     }
 };
 
-/**
- * Handle user authentication verification processing.
- * Verifies identity credentials against the MongoDB deployment.
- */
 exports.postLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        // Find user by administrative system unique email entry parameters
         const user = await User.findOne({ email });
         if (!user) {
             return res.render('pages/login', { 
@@ -43,7 +34,6 @@ exports.postLogin = async (req, res) => {
             });
         }
 
-        // Execute cryptographic bcrypt hash comparison parameters checking
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return res.render('pages/login', { 
@@ -55,7 +45,6 @@ exports.postLogin = async (req, res) => {
             });
         }
 
-        // Establish secure payload data parameters inside the Express Session state
         req.session.user = {
             id: user._id,
             email: user.email,
@@ -67,10 +56,8 @@ exports.postLogin = async (req, res) => {
             profilePicture: user.profilePicture
         };
 
-        // Cache dynamic notification messaging to display on successful layout landing
         req.session.success = `Welcome back, ${user.username}!`;
 
-        // Direct paths processing based on user administrative access rights setting
         if (user.role === 'admin') {
             return res.redirect('/admin/dashboard');
         }
@@ -82,9 +69,6 @@ exports.postLogin = async (req, res) => {
     }
 };
 
-/**
- * Render the registration interface layout.
- */
 exports.getRegister = (req, res) => {
     try {
         res.render('pages/register', { 
@@ -97,14 +81,10 @@ exports.getRegister = (req, res) => {
     }
 };
 
-/**
- * Process new customer creation registration sequences.
- */
 exports.postRegister = async (req, res) => {
     try {
         const { username, email, password, phone } = req.body;
 
-        // Perform transactional validation check to enforce credential uniqueness
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
             return res.render('pages/register', { 
@@ -113,7 +93,6 @@ exports.postRegister = async (req, res) => {
             });
         }
 
-        // Build new structural User instances model placeholder state
         const newUser = new User({ 
             username, 
             email, 
@@ -124,7 +103,6 @@ exports.postRegister = async (req, res) => {
         
         await newUser.save();
 
-        // Autologin structural setup integration following success verification parameters
         req.session.user = {
             id: newUser._id,
             email: newUser.email,
@@ -147,9 +125,6 @@ exports.postRegister = async (req, res) => {
     }
 };
 
-/**
- * Terminate current user authentication session state parameters.
- */
 exports.logout = (req, res) => {
     try {
         req.session.destroy((err) => {
@@ -157,7 +132,7 @@ exports.logout = (req, res) => {
                 console.error('Error logging out user session context:', err);
                 return res.redirect('/store');
             }
-            res.clearCookie('connect.sid'); // Wipe system authorization tracking cookies
+            res.clearCookie('connect.sid');
             res.redirect('/auth/login?logged_out=true');
         });
     } catch (err) {

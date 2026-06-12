@@ -19,7 +19,6 @@ const fileFilter = (req, file, cb) => {
     if (mimetype && extname) {
         return cb(null, true);
     } else {
-        // PERBAIKAN: Mengubah pesan galat ke dalam Bahasa Inggris profesional
         cb(new Error('Error: Only image files (jpeg, jpg, png, gif, webp) are allowed!'), false);
     }
 };
@@ -27,7 +26,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 5 * 1024 * 1024 // Enforce strict 5MB maximum file size capacity limit
+        fileSize: 5 * 1024 * 1024
     },
     fileFilter: fileFilter
 });

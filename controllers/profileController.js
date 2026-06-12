@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Order = require('../models/Order');
+const Review = require('../models/Review');
 
 /**
  * Render the user's secure profile dashboard.
@@ -18,6 +19,9 @@ exports.getProfile = async (req, res) => {
             .sort({ createdAt: -1 })
             .lean();
 
+        const userReviews = await Review.find({ user: userId }).select('book').lean();
+        const reviewedBookIds = userReviews.map(review => review.book.toString());
+
         const success = req.query.success || (req.session ? req.session.success : null);
         if (req.session && req.session.success) {
             delete req.session.success;
@@ -29,6 +33,7 @@ exports.getProfile = async (req, res) => {
             pageTitle: `${user.username}'s Profile - Litera Bookstore`,
             user,
             orders,
+            reviewedBookIds,
             success,
             notification
         });
@@ -38,6 +43,7 @@ exports.getProfile = async (req, res) => {
             pageTitle: 'Profile - Litera Bookstore',
             user: req.session.user, 
             orders: [],
+            reviewedBookIds: [],
             success: null,
             notification: 'Error loading structural history data.'
         });
@@ -58,7 +64,6 @@ exports.getEditProfile = async (req, res) => {
             return res.redirect('/auth/login');
         }
 
-        // SINKRONISASI: Mengubah 'pages/edit-profile' menjadi 'pages/editProfile' sesuai file fisik
         res.render('pages/editProfile', {
             pageTitle: 'Edit Profile - Litera Bookstore',
             user,
@@ -79,7 +84,6 @@ exports.postEditProfile = async (req, res) => {
             return res.redirect('/auth/login');
         }
 
-        // Menangkap data biografi, nomor telepon, dan nested object data alamat dari editProfile.ejs
         const { bio, phone, address } = req.body;
         const userId = req.session.user.id;
 

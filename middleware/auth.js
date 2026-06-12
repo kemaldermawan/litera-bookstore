@@ -1,16 +1,12 @@
 const User = require('../models/User');
 
 module.exports = {
-    /**
-     * Middleware to verify if the user is authenticated.
-     * Redirects to the login page with an error if no session exists.
-     */
+
     isLoggedIn(req, res, next) {
         try {
             if (!req.session || !req.session.user) {
                 return res.redirect('/auth/login?error=You must be signed in to access this page.');
             }
-            // Bind session user data to the request object for downstream controllers
             req.user = req.session.user;
             next();
         } catch (err) {
@@ -19,10 +15,6 @@ module.exports = {
         }
     },
 
-    /**
-     * Middleware to verify if the authenticated user has administrative privileges.
-     * Redirects to the store catalog if the user role is not 'admin'.
-     */
     isAdmin(req, res, next) {
         try {
             if (!req.session || !req.session.user || req.session.user.role !== 'admin') {
@@ -35,10 +27,6 @@ module.exports = {
         }
     },
 
-    /**
-     * Middleware to enforce profile completion before processing high-priority actions.
-     * Requires valid contact details and structural geographical parameters.
-     */
     mustCompleteProfile(req, res, next) {
         try {
             const user = req.session.user;

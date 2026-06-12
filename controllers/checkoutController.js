@@ -2,10 +2,6 @@ const Book = require("../models/Book");
 const Order = require("../models/Order");
 const mongoose = require("mongoose");
 
-/**
- * Render the secure checkout overview interface for physical book reservations.
- * Maps operational items directly from the Express Session payload state.
- */
 exports.checkoutCart = async (req, res) => {
     try {
         const sessionCart = req.session.cart || [];
@@ -13,7 +9,6 @@ exports.checkoutCart = async (req, res) => {
             return res.redirect("/cart?error=Checkout initialization failed. Your shopping cart is currently empty.");
         }
 
-        // Map session-based data items safely to structural presentation array models
         const checkoutItems = sessionCart.map(item => ({
             id: item.bookId,
             title: item.title,
@@ -22,10 +17,8 @@ exports.checkoutCart = async (req, res) => {
             coverImage: item.coverImage 
         }));
 
-        // Compute pricing aggregates across the mapped array structure
         const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-        // Double-check profile presence context parameters before rendering layout targets
         if (!req.session.user) {
             return res.redirect("/auth/login?error=Session timeout. Please sign in again.");
         }
@@ -43,10 +36,6 @@ exports.checkoutCart = async (req, res) => {
     }
 };
 
-/**
- * Validate shelf stock availability and construct a new local store order transaction.
- * Synchronizes body-driven quantities and maps dynamic payment types into MongoDB.
- */
 exports.createOrder = async (req, res) => {
     try {
         const sessionCart = req.session.cart || [];
@@ -58,14 +47,12 @@ exports.createOrder = async (req, res) => {
             return res.redirect("/cart?error=Order placement rejected. Empty cart footprint.");
         }
 
-        // Strict fallback validation check to enforce baseline profile phone and address requirements
         if (!user || !user.id) {
             return res.redirect("/auth/profile?notification=complete_profile_required");
         }
 
         const items = [];
         
-        // --- QUANTITY RE-VALIDATION & INVENTORY STOCK CHECK ---
         for (const item of sessionCart) {
             const finalQty = bodyQuantities[item.bookId] ? parseInt(bodyQuantities[item.bookId]) : item.qty;
             
@@ -89,7 +76,6 @@ exports.createOrder = async (req, res) => {
             return res.redirect("/cart?error=Order processing blocked due to structural calculation errors.");
         }
 
-        // --- HIGH-PERFORMANCE TRANSACTIONS VIA BULKWRITE ---
         const bulkUpdateOperations = items.map(item => ({
             updateOne: {
                 filter: { _id: item.book },
@@ -106,7 +92,6 @@ exports.createOrder = async (req, res) => {
             await Book.bulkWrite(bulkUpdateOperations);
         }
 
-        // Menentukan label status awal pesanan berdasarkan jenis metode pembayaran pilihan konsumen
         let initialOrderStatus = "Pending Payment";
         if (paymentMethod === "Cash") {
             initialOrderStatus = "Pending Pickup";
@@ -117,10 +102,8 @@ exports.createOrder = async (req, res) => {
         const holdExpiryDate = new Date();
         holdExpiryDate.setHours(holdExpiryDate.getHours() + 24);
 
-        // PERBAIKAN KRITIKAL: Memastikan instansiasi User ID dikonversi secara eksplisit ke dalam tipe ObjectId Mongoose
         const mongooseUserId = new mongoose.Types.ObjectId(user.id);
 
-        // Memasukkan dokumen transaksi baru ke pangkalan data MongoDB secara aman
         const newOrder = await Order.create({
             user: mongooseUserId,
             items,
@@ -133,10 +116,8 @@ exports.createOrder = async (req, res) => {
             status: initialOrderStatus
         });
 
-        // Bersihkan memori basket session setelah dokumen order berhasil persisten di database
         req.session.cart = [];
 
-        // Redirect langsung menuju endpoint halaman sukses order komersial baru
         res.redirect(`/order-success/${newOrder._id}`);
     } catch (err) {
         console.error("Critical order processing operation exception inside backend core:", err);

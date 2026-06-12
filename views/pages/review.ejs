@@ -64,7 +64,6 @@
     .review-generation-infrastructure { min-height: 70vh; }
     .cursor-pointer { cursor: pointer; }
     
-    /* Interactive visual selector tokens for star matrix mapping */
     #star-rating .star-icon {
         transition: color 0.15s ease-in-out, transform 0.15s ease-in-out;
     }
@@ -80,14 +79,66 @@
 </style>
 
 <script>
-    document.getElementById('publicAssetReviewForm').addEventListener('submit', function(event) {
-        const ratingValueNode = document.getElementById('rating-input').value;
+    document.addEventListener('DOMContentLoaded', () => {
+        const starElements = document.querySelectorAll('#star-rating .star-icon');
+        const ratingInputNode = document.getElementById('rating-input');
         const validationFeedbackNode = document.getElementById('ratingValidationFeedback');
-        
-        if (parseInt(ratingValueNode) === 0) {
-            event.preventDefault(); // Halt active form dispatch pipeline
-            if (validationFeedbackNode) validationFeedbackNode.classList.remove('d-none');
+        const formEngine = document.getElementById('publicAssetReviewForm');
+
+        starElements.forEach(star => {
+            star.addEventListener('mouseover', function() {
+                const currentHoverValue = parseInt(this.getAttribute('data-value'));
+                highlightStarsMatrix(currentHoverValue, 'hover');
+            });
+
+            star.addEventListener('mouseout', function() {
+                removeStarsStyleClass('hover');
+            });
+
+            star.addEventListener('click', function() {
+                const selectedRatingValue = parseInt(this.getAttribute('data-value'));
+                ratingInputNode.value = selectedRatingValue;
+                
+                removeStarsStyleClass('selected');
+                highlightStarsMatrix(selectedRatingValue, 'selected');
+                
+                if (selectedRatingValue > 0 && validationFeedbackNode) {
+                    validationFeedbackNode.classList.add('d-none');
+                }
+            });
+        });
+
+        function highlightStarsMatrix(limitValue, className) {
+            starElements.forEach(star => {
+                const starValue = parseInt(star.getAttribute('data-value'));
+                if (starValue <= limitValue) {
+                    star.classList.add(className);
+                    if (className === 'selected') {
+                        star.classList.remove('text-muted');
+                    }
+                }
+            });
         }
+
+        function removeStarsStyleClass(className) {
+            starElements.forEach(star => {
+                star.classList.remove(className);
+                if (className === 'selected') {
+                    star.classList.add('text-muted');
+                }
+            });
+        }
+
+        formEngine.addEventListener('submit', function(event) {
+            const finalRatingScore = parseInt(ratingInputNode.value);
+            
+            if (finalRatingScore === 0 || isNaN(finalRatingScore)) {
+                event.preventDefault(); 
+                if (validationFeedbackNode) {
+                    validationFeedbackNode.classList.remove('d-none');
+                }
+            }
+        });
     });
 </script>
 

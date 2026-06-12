@@ -31,7 +31,6 @@ const OrderSchema = new Schema({
     paymentMethod: {
         type: String,
         required: true,
-        // PERBAIKAN: Ekspansi nilai enum agar mencakup seluruh opsi pembayaran dummy Indonesia
         enum: ['Cash', 'Bank Transfer', 'GoPay', 'OVO', 'Dana', 'BCA Virtual Account', 'Mandiri Virtual Account', 'COD']
     },
     pickupDetails: {
@@ -41,7 +40,6 @@ const OrderSchema = new Schema({
     status: {
         type: String,
         required: true,
-        // PERBAIKAN: Ekspansi nilai enum status agar adaptif terhadap metode pembayaran e-wallet dan pengiriman kurir
         enum: ['Pending Pickup', 'Pending Payment', 'Pending Delivery', 'Completed', 'Cancelled'],
         default: 'Pending Payment'
     }

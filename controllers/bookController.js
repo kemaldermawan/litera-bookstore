@@ -2,13 +2,8 @@ const Book = require('../models/Book');
 const Review = require('../models/Review');
 const Order = require('../models/Order');
 
-/**
- * Fetch and aggregate book collections for the main bookstore storefront.
- * Compiles all 8 structural categories along with new arrivals and bestsellers.
- */
 exports.getAllBooks = async (req, res) => {
     try {
-        // Sinkronisasi Ekspansi: Menampung seluruh 8 genre resmi dari MongoDB cluster
         const [
             newArrivals, 
             bestsellers, 
@@ -62,10 +57,6 @@ exports.getAllBooks = async (req, res) => {
     }
 };
 
-/**
- * Retrieve detailed profiles for a specific book asset.
- * Validates purchase histories to restrict review submission flags.
- */
 exports.getBookDetail = async (req, res) => {
     try {
         const bookId = req.params.id;
@@ -87,14 +78,26 @@ exports.getBookDetail = async (req, res) => {
         }).limit(4).lean();
 
         let hasPurchased = false;
+        let hasReviewed = false;
+
         if (sessionUser && sessionUser.role === 'user') {
             const completedOrder = await Order.findOne({
                 user: sessionUser.id,
                 status: 'Completed',
                 'items.book': bookId
             }).lean();
+            
             if (completedOrder) {
                 hasPurchased = true;
+            }
+
+            const existingReview = await Review.findOne({
+                user: sessionUser.id,
+                book: bookId
+            }).lean();
+            
+            if (existingReview) {
+                hasReviewed = true;
             }
         }
 
@@ -104,7 +107,8 @@ exports.getBookDetail = async (req, res) => {
             relatedBooks,
             reviews,
             user: sessionUser,
-            hasPurchased
+            hasPurchased,
+            hasReviewed
         });
     } catch (err) {
         console.error('Error compiling asset product details view data:', err);
@@ -112,9 +116,6 @@ exports.getBookDetail = async (req, res) => {
     }
 };
 
-/**
- * Execute text pattern queries across title, author, and genre fields inside MongoDB.
- */
 exports.searchBooks = async (req, res, next) => {
     try {
         const query = req.query.q ? req.query.q.trim() : '';

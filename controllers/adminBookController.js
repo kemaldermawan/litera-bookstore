@@ -2,10 +2,6 @@ const Book = require('../models/Book');
 const Order = require('../models/Order');
 const Review = require('../models/Review');
 
-/**
- * Render the main administrative dashboard.
- * Compiles all registered books within the physical store inventory.
- */
 exports.getDashboard = async (req, res) => {
     try {
         const books = await Book.find().lean();
@@ -23,9 +19,6 @@ exports.getDashboard = async (req, res) => {
     }
 };
 
-/**
- * Render the asset data editor workspace form interface.
- */
 exports.getEditBook = async (req, res) => {
     try {
         const book = await Book.findById(req.params.id).lean();
@@ -43,9 +36,6 @@ exports.getEditBook = async (req, res) => {
     }
 };
 
-/**
- * Process inbound form payloads to register a brand-new book asset inside MongoDB.
- */
 exports.createBook = async (req, res) => {
     try {
         const { title, author, synopsis, price, stock, category } = req.body;
@@ -72,9 +62,6 @@ exports.createBook = async (req, res) => {
     }
 };
 
-/**
- * Process configuration updates for an existing book catalog record item.
- */
 exports.updateBook = async (req, res) => {
     try {
         const { title, author, synopsis, price, stock, category } = req.body;
@@ -104,9 +91,6 @@ exports.updateBook = async (req, res) => {
     }
 };
 
-/**
- * Evict a designated book document from the library datastore collection.
- */
 exports.deleteBook = async (req, res) => {
     try {
         const result = await Book.findByIdAndDelete(req.params.id);
@@ -121,11 +105,6 @@ exports.deleteBook = async (req, res) => {
     }
 };
 
-// --- DYNAMIC AJAX DATA STREAM ENDPOINTS (BACKEND API FOR THE ADMIN DASHBOARD) ---
-
-/**
- * Fetch and stream historical order reservation records to feeding AJAX tables.
- */
 exports.getTransactions = async (req, res) => {
     try {
         const transactions = await Order.find({})
@@ -139,9 +118,6 @@ exports.getTransactions = async (req, res) => {
     }
 };
 
-/**
- * Fetch and stream public user book reviews to feeding data tables.
- */
 exports.getReviews = async (req, res) => {
     try {
         const reviews = await Review.find({})
@@ -156,9 +132,6 @@ exports.getReviews = async (req, res) => {
     }
 };
 
-/**
- * NEW ACTION: Update order status to Completed via Admin Control trigger
- */
 exports.completeOrder = async (req, res) => {
     try {
         const orderId = req.params.id;
@@ -174,9 +147,6 @@ exports.completeOrder = async (req, res) => {
     }
 };
 
-/**
- * NEW ACTION: Delete customer review via Admin moderation panel
- */
 exports.deleteReview = async (req, res) => {
     try {
         const reviewId = req.params.id;

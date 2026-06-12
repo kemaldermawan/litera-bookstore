@@ -1,9 +1,5 @@
 const Book = require('../models/Book');
 
-/**
- * Render the customer's active shopping cart layout.
- * Extracts data fields from the Express Session state and computes price aggregates.
- */
 exports.getCart = (req, res) => {
     try {
         const cart = req.session.cart || [];
@@ -29,10 +25,6 @@ exports.getCart = (req, res) => {
     }
 };
 
-/**
- * Add a designated physical book asset to the session-based cart layer.
- * Validates baseline structural shelf stock parameters before execution.
- */
 exports.addToCart = async (req, res) => {
     try {
         const bookId = req.params.id;
@@ -62,7 +54,6 @@ exports.addToCart = async (req, res) => {
             }
             existingItem.qty += 1;
         } else {
-            // INTEGRASI: Memasukkan properti stock ke dalam memori session cart
             cart.push({
                 bookId: book._id.toString(),
                 title: book.title,
@@ -95,9 +86,6 @@ exports.addToCart = async (req, res) => {
     }
 };
 
-/**
- * Synchronize mass batch modifications of item quantities sent from the cart form interface.
- */
 exports.updateCart = async (req, res) => {
     try {
         const quantities = req.body.qty; 
@@ -131,9 +119,6 @@ exports.updateCart = async (req, res) => {
     }
 };
 
-/**
- * Evict a designated item vector from the current active session cart array footprint.
- */
 exports.deleteItem = (req, res) => {
     try {
         const bookId = req.params.id;
@@ -141,7 +126,6 @@ exports.deleteItem = (req, res) => {
             req.session.cart = [];
         }
 
-        // Memfilter array untuk membuang objek buku yang dicari
         req.session.cart = req.session.cart.filter(item => item.bookId !== bookId);
 
         res.redirect('/cart?success=Item removed from your shopping cart successfully.');
