@@ -81,13 +81,13 @@ exports.getBookDetail = async (req, res) => {
         let hasReviewed = false;
 
         if (sessionUser && sessionUser.role === 'user') {
-            const completedOrder = await Order.findOne({
+            const purchasedOrder = await Order.findOne({
                 user: sessionUser.id,
-                status: 'Completed',
+                status: { $ne: 'Cancelled' },
                 'items.book': bookId
             }).lean();
             
-            if (completedOrder) {
+            if (purchasedOrder) {
                 hasPurchased = true;
             }
 

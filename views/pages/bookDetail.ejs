@@ -76,6 +76,16 @@
                         </button>
                     <% } %>
                 <% } %>
+
+                <% if(hasPurchased){ %>
+                    <div class="d-flex">
+                        <button class="btn btn-success fw-bold py-2 rounded-pill shadow-sm w-100" 
+                            id="purchased-btn" disabled style="max-width: 360px;">
+                            <i class="bi bi-check-circle-fill me-1"></i>Purchased
+                        </button>
+                    </div>
+                <% } %>
+
             </div>
 
         </div>
