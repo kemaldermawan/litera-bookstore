@@ -119,27 +119,53 @@ exports.getBookDetail = async (req, res) => {
 exports.searchBooks = async (req, res, next) => {
     try {
         const query = req.query.q ? req.query.q.trim() : '';
+        const sort = req.query.sort || '';
+        const rating = req.query.rating || '';
         
         if (!query) {
             return res.render('pages/searchResult', {
                 pageTitle: 'Search Results - Litera Bookstore',
                 query: '',
-                books: []
+                books: [],
+                sort: '',
+                rating: ''
             });
         }
 
-        const books = await Book.find({
+        // Map frontend sort parameters to Mongoose sort objects
+        let sortOption = {};
+        if (sort === 'price_asc') {
+            sortOption = { price: 1 };
+        } else if (sort === 'price_desc') {
+            sortOption = { price: -1 };
+        } else if (sort === 'popularity') {
+            sortOption = { salesCount: -1 };
+        }
+
+        // Build search query conditions
+        const findQuery = {
             $or: [
                 { title: { $regex: query, $options: 'i' } },
                 { author: { $regex: query, $options: 'i' } },
                 { genre: { $regex: query, $options: 'i' } }
             ]
-        }).lean();
+        };
+
+        if (rating) {
+            const numericRating = Number(rating);
+            if (!isNaN(numericRating)) {
+                findQuery.averageRating = { $gte: numericRating };
+            }
+        }
+
+        const books = await Book.find(findQuery).sort(sortOption).lean();
 
         res.render('pages/searchResult', {
             pageTitle: `Search Results for "${query}" - Litera Bookstore`,
             query: query,
-            books: books
+            books: books,
+            sort: sort,
+            rating: rating
         });
     } catch (error) {
         next(error);
