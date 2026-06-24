@@ -145,7 +145,7 @@ exports.deleteAccount = async (req, res) => {
                 return res.status(500).json({ success: false, message: 'Failed to flush session tracking data.' });
             }
             res.clearCookie('connect.sid');
-            res.redirect('/auth/login?deleted=true');
+            res.redirect('/auth/login?deleted=' + encodeURIComponent('Your account has been permanently deleted.'));
         });
     } catch (err) {
         console.error('Account erasure runtime operational failure:', err);

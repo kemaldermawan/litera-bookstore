@@ -76,6 +76,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text bg-white text-muted"><i class="bi bi-lock"></i></span>
                                     <input type="password" class="form-control" id="password" name="password" required placeholder="Minimum 8 characters">
+                                    <span class="input-group-text bg-white text-muted" style="cursor: pointer;" onclick="togglePasswordVisibility('password', 'togglePasswordIcon')"><i class="bi bi-eye-slash" id="togglePasswordIcon"></i></span>
                                 </div>
                             </div>
 
@@ -84,9 +85,10 @@
                                 <div class="input-group">
                                     <span class="input-group-text bg-white text-muted"><i class="bi bi-shield-check"></i></span>
                                     <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required placeholder="Re-enter password">
+                                    <span class="input-group-text bg-white text-muted" style="cursor: pointer;" onclick="togglePasswordVisibility('confirmPassword', 'toggleConfirmPasswordIcon')"><i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon"></i></span>
                                 </div>
                                 <div id="passwordMismatchInfo" class="text-danger small mt-1 d-none">
-                                    <i class="bi bi-exclamation-circle me-1"></i>Passwords do not match. Please ensure both fields are identical.
+                                    <i class="bi bi-exclamation-circle me-1"></i>Passwords do not match.
                                 </div>
                             </div>
 
@@ -161,6 +163,56 @@
                 }
             });
         })();
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById(iconId);
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            }
+        }
+    </script>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div id="register-error-popup" class="popup-alert-node">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><%= error %>
+        </div>
+    <% } %>
+
+    <style>
+        .popup-alert-node {
+            position: fixed;
+            top: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #e74c3c;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            font-weight: 600;
+            z-index: 1050;
+            opacity: 0;
+            animation: fadeAlertInOut 3.5s ease forwards;
+        }
+        @keyframes fadeAlertInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-15px); }
+            12% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            88% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-15px); }
+        }
+    </style>
+    <script>
+        setTimeout(() => {
+            const errorPopup = document.getElementById('register-error-popup');
+            if (errorPopup) errorPopup.remove();
+        }, 3700);
     </script>
 </body>
 </html>

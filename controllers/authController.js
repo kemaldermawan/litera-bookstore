@@ -5,12 +5,14 @@ exports.getLogin = (req, res) => {
         const deleted = req.query.deleted || undefined;
         const loggedOut = req.query.logged_out || undefined;
         const error = req.query.error || null;
+        const success = req.query.success || null;
 
         res.render('pages/login', { 
             pageTitle: 'Sign In - Litera Bookstore',
             deleted, 
             loggedOut,
             error,
+            success,
             email: ''
         });
     } catch (err) {
@@ -38,7 +40,7 @@ exports.postLogin = async (req, res) => {
         if (!isMatch) {
             return res.render('pages/login', { 
                 pageTitle: 'Sign In - Litera Bookstore',
-                error: 'Invalid email address or password configuration.', 
+                error: 'Invalid credentials provided.', 
                 email,
                 deleted: undefined,
                 loggedOut: undefined
@@ -71,9 +73,10 @@ exports.postLogin = async (req, res) => {
 
 exports.getRegister = (req, res) => {
     try {
+        const error = req.query.error || null;
         res.render('pages/register', { 
             pageTitle: 'Create Account - Litera Bookstore',
-            error: null 
+            error 
         });
     } catch (err) {
         console.error('Error rendering registration view:', err);
@@ -87,10 +90,7 @@ exports.postRegister = async (req, res) => {
 
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
-            return res.render('pages/register', { 
-                pageTitle: 'Create Account - Litera Bookstore',
-                error: 'Email address or username is already registered within our system.' 
-            });
+            return res.redirect('/auth/register?error=' + encodeURIComponent('Username or Email is already taken.'));
         }
 
         const newUser = new User({ 
@@ -133,7 +133,7 @@ exports.logout = (req, res) => {
                 return res.redirect('/store');
             }
             res.clearCookie('connect.sid');
-            res.redirect('/auth/login?logged_out=true');
+            res.redirect('/auth/login?success=' + encodeURIComponent('You have been successfully logged out.'));
         });
     } catch (err) {
         console.error('Logout handler configuration failure:', err);
