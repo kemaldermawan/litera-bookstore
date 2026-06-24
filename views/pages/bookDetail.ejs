@@ -41,32 +41,28 @@
 
                 <% if (typeof user === 'undefined' || !user || user.role === 'user') { %>
                     <% if (book.stock > 0) { %>
-                        <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex flex-wrap align-items-center gap-3">
                             
                             <% if (typeof user === 'undefined' || !user) { %>
-                                <a href="/auth/login?error=Please log in to add items to your cart." class="btn btn-outline-primary fw-bold px-4 py-2.5 rounded-pill shadow-sm">
+                                <a href="/auth/login?error=Please log in to add items to your cart." class="btn btn-outline-primary fw-bold px-4 py-2 rounded-pill shadow-sm">
                                     <i class="bi bi-cart-plus me-1"></i>Add To Cart
                                 </a>
                             <% } else { %>
-                                <form action="/cart/add/<%= book._id %>" method="POST" class="d-inline ajax-cart-form">
-                                    <button type="submit" class="btn btn-outline-primary fw-bold px-4 py-2.5 rounded-pill shadow-sm">
+                                <form action="/cart/add/<%= book._id %>" method="POST" class="m-0 p-0 ajax-cart-form">
+                                    <button type="submit" class="btn btn-outline-primary fw-bold px-4 py-2 rounded-pill shadow-sm">
                                         <i class="bi bi-cart-plus me-1"></i>Add To Cart
                                     </button>
                                 </form>
                             <% } %>
                             
                             <% if (typeof user === 'undefined' || !user) { %>
-                                <a href="/auth/login?error=Please log in to buy items." class="btn btn-primary fw-bold px-5 py-2.5 rounded-pill shadow-sm text-white">
+                                <a href="/auth/login?error=Please log in to buy items." class="btn btn-primary fw-bold px-5 py-2 rounded-pill shadow-sm text-white">
                                     Buy Now
                                 </a>
                             <% } else { %>
-                                <form action="/checkout" method="POST" class="d-inline">
-                                    <input type="hidden" name="bookId" value="<%= book._id %>">
-                                    <input type="hidden" name="isBuyNow" value="true">
-                                    <button type="submit" class="btn btn-primary fw-bold px-5 py-2.5 rounded-pill shadow-sm text-white">
-                                        Buy Now
-                                    </button>
-                                </form>
+                                <a href="/checkout?isBuyNow=true&bookId=<%= book._id %>" class="btn btn-primary fw-bold px-5 py-2 rounded-pill shadow-sm text-white">
+                                    Buy Now
+                                </a>
                             <% } %>
 
                         </div>

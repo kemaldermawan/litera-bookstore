@@ -1,0 +1,13 @@
+# Identitas Proyek
+Aplikasi ini adalah Litera Bookstore. Sistem web untuk operasi toko buku fisik profesional yang mendukung inventaris nyata dan pengambilan produk langsung di lokasi cabang.
+
+# Tumpukan Teknologi Terstruktur
+1. Backend Node.js dan kerangka kerja Express.js.
+2. Basis data MongoDB menggunakan ODM Mongoose.
+3. Templat tampilan antarmuka menggunakan EJS dan Bootstrap 5.
+
+# Aturan Eksekusi Pengembangan
+1. Seluruh modifikasi wajib mematuhi pola desain arsitektur Model-View-Controller (MVC) yang telah terbentuk pada sistem.
+2. Operasi asinkronus ke basis data harus mengeksploitasi blok try/catch untuk mencegah kegagalan eksekusi peladen.
+3. Dilarang merusak atau menimpa kelas tata letak CSS antarmuka pengguna pada berkas direktori views.
+4. Ekspansi fungsionalitas harus diawali dengan modifikasi skema basis data pada direktori models sebelum menyentuh logika pengontrol.

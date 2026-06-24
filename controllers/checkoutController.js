@@ -4,20 +4,43 @@ const mongoose = require("mongoose");
 
 exports.checkoutCart = async (req, res) => {
     try {
-        const sessionCart = req.session.cart || [];
-        if (sessionCart.length === 0) {
-            return res.redirect("/cart?error=Checkout initialization failed. Your shopping cart is currently empty.");
+        const isBuyNow = req.query.isBuyNow === "true";
+        let checkoutItems = [];
+        let subtotal = 0;
+
+        if (isBuyNow) {
+            const { bookId } = req.query;
+            if (!bookId) {
+                return res.redirect("/store?error=No book specified for Buy Now checkout.");
+            }
+            const singleBook = await Book.findById(bookId);
+            if (!singleBook) {
+                return res.redirect("/store?error=The requested book could not be found.");
+            }
+            checkoutItems = [{
+                id: singleBook._id.toString(),
+                title: singleBook.title,
+                price: singleBook.price,
+                quantity: 1,
+                coverImage: singleBook.coverImage
+            }];
+            subtotal = singleBook.price;
+        } else {
+            const sessionCart = req.session.cart || [];
+            if (sessionCart.length === 0) {
+                return res.redirect("/cart?error=Checkout initialization failed. Your shopping cart is currently empty.");
+            }
+
+            checkoutItems = sessionCart.map(item => ({
+                id: item.bookId,
+                title: item.title,
+                price: item.price,
+                quantity: item.qty,
+                coverImage: item.coverImage 
+            }));
+
+            subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         }
-
-        const checkoutItems = sessionCart.map(item => ({
-            id: item.bookId,
-            title: item.title,
-            price: item.price,
-            quantity: item.qty,
-            coverImage: item.coverImage 
-        }));
-
-        const subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
         if (!req.session.user) {
             return res.redirect("/auth/login?error=Session timeout. Please sign in again.");
@@ -28,7 +51,7 @@ exports.checkoutCart = async (req, res) => {
             user: req.session.user,
             items: checkoutItems,
             subtotal,
-            isBuyNow: false
+            isBuyNow: isBuyNow
         });
     } catch (err) {
         console.error("Critical checkout view generation failure:", err);
@@ -38,12 +61,35 @@ exports.checkoutCart = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
     try {
-        const sessionCart = req.session.cart || [];
+        const isBuyNow = req.body.isBuyNow === "true";
         const bodyQuantities = req.body.qty || {};
         const { paymentMethod } = req.body;
         const user = req.session.user;
 
-        if (sessionCart.length === 0) {
+        let activeCart = [];
+
+        if (isBuyNow) {
+            const { bookId } = req.body;
+            if (!bookId) {
+                return res.redirect("/store?error=No book specified for Buy Now order processing.");
+            }
+            const singleBook = await Book.findById(bookId);
+            if (!singleBook) {
+                return res.redirect("/store?error=The requested book could not be found.");
+            }
+            const qty = bodyQuantities[bookId] ? parseInt(bodyQuantities[bookId]) : 1;
+            activeCart = [{
+                bookId: singleBook._id.toString(),
+                title: singleBook.title,
+                price: singleBook.price,
+                qty: qty,
+                coverImage: singleBook.coverImage
+            }];
+        } else {
+            activeCart = req.session.cart || [];
+        }
+
+        if (activeCart.length === 0) {
             return res.redirect("/cart?error=Order placement rejected. Empty cart footprint.");
         }
 
@@ -53,7 +99,7 @@ exports.createOrder = async (req, res) => {
 
         const items = [];
         
-        for (const item of sessionCart) {
+        for (const item of activeCart) {
             const finalQty = bodyQuantities[item.bookId] ? parseInt(bodyQuantities[item.bookId]) : item.qty;
             
             const currentBook = await Book.findById(item.bookId);
@@ -116,7 +162,9 @@ exports.createOrder = async (req, res) => {
             status: initialOrderStatus
         });
 
-        req.session.cart = [];
+        if (!isBuyNow) {
+            req.session.cart = [];
+        }
 
         res.redirect(`/order-success/${newOrder._id}`);
     } catch (err) {
