@@ -56,6 +56,18 @@
                             <% } %>
                             
                             <% if (typeof user === 'undefined' || !user) { %>
+                                <a href="/auth/login?error=Please log in to add items to your wishlist." class="btn btn-outline-secondary fw-bold px-4 py-2 rounded-pill shadow-sm">
+                                    <i class="bi bi-heart me-1"></i>Add To Wishlist
+                                </a>
+                            <% } else { %>
+                                <form action="/wishlist/add/<%= book._id %>" method="POST" class="m-0 p-0 ajax-wishlist-form">
+                                    <button type="submit" class="btn btn-outline-secondary fw-bold px-4 py-2 rounded-pill shadow-sm">
+                                        <i class="bi bi-heart me-1"></i>Add To Wishlist
+                                    </button>
+                                </form>
+                            <% } %>
+
+                            <% if (typeof user === 'undefined' || !user) { %>
                                 <a href="/auth/login?error=Please log in to buy items." class="btn btn-primary fw-bold px-5 py-2 rounded-pill shadow-sm text-white">
                                     Buy Now
                                 </a>

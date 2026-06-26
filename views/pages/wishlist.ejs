@@ -1,0 +1,81 @@
+<%- include('../partials/navbar') %>
+
+<div class="container wishlist-page-infrastructure mb-5" style="margin-top: 24px;">
+    
+    <div class="row mb-4 border-bottom pb-2">
+        <div class="col-12">
+            <h2 class="fw-bold text-dark mb-1">Your Wishlist</h2>
+            <p class="text-muted mb-0">Save your favorite books and track their availability</p>
+        </div>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 small mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><%= error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success alert-dismissible fade show rounded-3 small mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><%= success %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+
+    <div class="row g-4">
+        <div class="col-12">
+            <% if (!wishlist || wishlist.books.length === 0) { %>
+                <div class="p-5 bg-white border rounded shadow-sm text-center">
+                    <div class="display-1 text-muted mb-3"><i class="bi bi-heartbreak"></i></div>
+                    <h4 class="fw-bold text-dark mb-2">Your Wishlist is Empty</h4>
+                    <p class="text-secondary small mb-4">You haven't saved any books for future purchases.</p>
+                    <a href="/store" class="btn btn-primary fw-semibold rounded-pill text-white px-4 shadow-sm">
+                        Browse Catalog
+                    </a>
+                </div>
+            <% } else { %>
+                <div class="row g-4">
+                    <% wishlist.books.forEach(book => { %>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="card h-100 shadow-sm border rounded-3 position-relative overflow-hidden transition-hover">
+                                <img src="<%= book.coverImage %>" class="card-img-top bg-light p-3" alt="<%= book.title %>" style="height: 280px; object-fit: contain;">
+                                
+                                <div class="card-body d-flex flex-column p-3">
+                                    <h6 class="card-title fw-bold text-dark text-truncate mb-1" title="<%= book.title %>"><%= book.title %></h6>
+                                    <p class="card-text text-muted font-sm mb-2">by <%= book.author %></p>
+                                    
+                                    <p class="card-text text-danger fw-semibold mt-auto mb-3 font-sm">
+                                        Rp <%= book.price ? book.price.toLocaleString('id-ID') : '0' %>
+                                    </p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                                        <a href="/store/book/<%= book._id %>" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold font-sm">
+                                            View Details
+                                        </a>
+                                        <form action="/wishlist/remove/<%= book._id %>" method="POST" class="m-0">
+                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3 fw-semibold font-sm">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<style>
+    .font-sm { font-size: 0.75rem; }
+    /* Memastikan batas minimum layar tercapai agar footer berada di dasar halaman */
+    .wishlist-page-infrastructure { min-height: 75vh; }
+    /* Animasi mikro untuk elevasi kartu */
+    .transition-hover { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+    .transition-hover:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+</style>
+
+<%- include('../partials/footer') %>

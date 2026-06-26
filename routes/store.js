@@ -3,6 +3,7 @@ const router = express.Router();
 const bookController = require('../controllers/bookController');
 const cartController = require('../controllers/cartController');
 const checkoutController = require('../controllers/checkoutController');
+const wishlistController = require('../controllers/wishlistController');
 const Review = require('../models/Review');
 const Book = require('../models/Book');
 const Order = require('../models/Order');
@@ -41,6 +42,10 @@ router.get('/cart/delete/:id', cartController.deleteItem);
 
 router.get('/checkout', isLoggedIn, mustCompleteProfile, checkoutController.checkoutCart);
 router.post('/checkout', isLoggedIn, mustCompleteProfile, checkoutController.createOrder);
+
+router.get('/wishlist', isLoggedIn, wishlistController.getWishlist);
+router.post('/wishlist/add/:bookId', isLoggedIn, wishlistController.addBookToWishlist);
+router.post('/wishlist/remove/:bookId', isLoggedIn, wishlistController.removeBookFromWishlist);
 
 router.get('/review/:id', isLoggedIn, async (req, res) => {
     try {
