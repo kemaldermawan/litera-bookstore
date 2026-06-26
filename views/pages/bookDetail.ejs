@@ -39,60 +39,69 @@
                     <% } %>
                 </div>
 
-                <% if (typeof user === 'undefined' || !user || user.role === 'user') { %>
-                    <% if (book.stock > 0) { %>
-                        <div class="d-flex flex-wrap align-items-center gap-3">
-                            
-                            <% if (typeof user === 'undefined' || !user) { %>
-                                <a href="/auth/login?error=Please log in to add items to your cart." class="btn btn-outline-primary fw-bold px-4 py-2 rounded-pill shadow-sm">
-                                    <i class="bi bi-cart-plus me-1"></i>Add To Cart
-                                </a>
-                            <% } else { %>
-                                <form action="/cart/add/<%= book._id %>" method="POST" class="m-0 p-0 ajax-cart-form">
-                                    <button type="submit" class="btn btn-outline-primary fw-bold px-4 py-2 rounded-pill shadow-sm">
-                                        <i class="bi bi-cart-plus me-1"></i>Add To Cart
-                                    </button>
-                                </form>
-                            <% } %>
-                            
-                            <% if (typeof user === 'undefined' || !user) { %>
-                                <a href="/auth/login?error=Please log in to add items to your wishlist." class="btn btn-outline-secondary fw-bold px-4 py-2 rounded-pill shadow-sm">
-                                    <i class="bi bi-heart me-1"></i>Add To Wishlist
-                                </a>
-                            <% } else { %>
-                                <form action="/wishlist/add/<%= book._id %>" method="POST" class="m-0 p-0 ajax-wishlist-form">
-                                    <button type="submit" class="btn btn-outline-secondary fw-bold px-4 py-2 rounded-pill shadow-sm">
-                                        <i class="bi bi-heart me-1"></i>Add To Wishlist
-                                    </button>
-                                </form>
-                            <% } %>
-
-                            <% if (typeof user === 'undefined' || !user) { %>
-                                <a href="/auth/login?error=Please log in to buy items." class="btn btn-primary fw-bold px-5 py-2 rounded-pill shadow-sm text-white">
-                                    Buy Now
-                                </a>
-                            <% } else { %>
-                                <a href="/checkout?isBuyNow=true&bookId=<%= book._id %>" class="btn btn-primary fw-bold px-5 py-2 rounded-pill shadow-sm text-white">
-                                    Buy Now
-                                </a>
-                            <% } %>
-
+                <% if(typeof hasPurchased !== 'undefined' && hasPurchased){ %>
+                    <div class="alert alert-success d-flex align-items-center py-2 px-3 mb-4 rounded-3 border-0 shadow-sm" role="alert" style="background-color: #d1e7dd; color: #0f5132; max-width: 400px;">
+                        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                        <div>
+                            <span class="fw-bold d-block">You own this book</span>
+                            <span class="small">Thank you for your previous purchase.</span>
                         </div>
-                    <% } else { %>
-                        <button class="btn btn-secondary fw-bold px-4 py-2.5 rounded-pill shadow-sm" disabled>
-                            <i class="bi bi-bell-slash me-1"></i>Unavailable
-                        </button>
-                    <% } %>
-                <% } %>
-
-                <% if(hasPurchased){ %>
-                    <div class="d-flex">
-                        <button class="btn btn-success fw-bold py-2 rounded-pill shadow-sm w-100" 
-                            id="purchased-btn" disabled style="max-width: 360px;">
-                            <i class="bi bi-check-circle-fill me-1"></i>Purchased
-                        </button>
                     </div>
                 <% } %>
+
+                <div style="max-width: 400px;">
+                    <% if (typeof user === 'undefined' || !user || user.role === 'user') { %>
+                        <% if (book.stock > 0) { %>
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <% if (typeof user === 'undefined' || !user) { %>
+                                        <a href="/auth/login?error=Please log in to add items to your cart." class="btn btn-outline-primary fw-bold py-2 rounded-pill shadow-sm w-100">
+                                            <i class="bi bi-cart-plus me-1"></i>Cart
+                                        </a>
+                                    <% } else { %>
+                                        <form action="/cart/add/<%= book._id %>" method="POST" class="m-0 p-0 ajax-cart-form">
+                                            <button type="submit" class="btn btn-outline-primary fw-bold py-2 rounded-pill shadow-sm w-100">
+                                                <i class="bi bi-cart-plus me-1"></i>Cart
+                                            </button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                                
+                                <div class="col-6">
+                                    <% if (typeof user === 'undefined' || !user) { %>
+                                        <a href="/auth/login?error=Please log in to buy items." class="btn btn-primary fw-bold py-2 rounded-pill shadow-sm text-white w-100">
+                                            Buy Now
+                                        </a>
+                                    <% } else { %>
+                                        <a href="/checkout?isBuyNow=true&bookId=<%= book._id %>" class="btn btn-primary fw-bold py-2 rounded-pill shadow-sm text-white w-100">
+                                            Buy Now
+                                        </a>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <% if (typeof user === 'undefined' || !user) { %>
+                                        <a href="/auth/login?error=Please log in to add items to your wishlist." class="btn btn-outline-secondary fw-bold py-2 rounded-pill shadow-sm w-100">
+                                            <i class="bi bi-heart me-1"></i>Add To Wishlist
+                                        </a>
+                                    <% } else { %>
+                                        <form action="/wishlist/add/<%= book._id %>" method="POST" class="m-0 p-0 ajax-wishlist-form">
+                                            <button type="submit" class="btn btn-outline-secondary fw-bold py-2 rounded-pill shadow-sm w-100">
+                                                <i class="bi bi-heart me-1"></i>Add To Wishlist
+                                            </button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <button class="btn btn-secondary fw-bold px-4 py-2.5 rounded-pill shadow-sm w-100" disabled>
+                                <i class="bi bi-bell-slash me-1"></i>Unavailable
+                            </button>
+                        <% } %>
+                    <% } %>
+                </div>
 
             </div>
 
@@ -190,6 +199,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+        // Penanganan asinkron untuk tombol Keranjang
         const cartForms = document.querySelectorAll('.ajax-cart-form');
         cartForms.forEach(form => {
             form.addEventListener('submit', async (event) => {
@@ -219,6 +229,50 @@
                     }
                 } catch (error) {
                     console.error('AJAX Detail-Cart operational failure:', error);
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonHtml;
+                }
+            });
+        });
+
+        // Penanganan asinkron untuk tombol Wishlist
+        const wishlistForms = document.querySelectorAll('.ajax-wishlist-form');
+        wishlistForms.forEach(form => {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const targetUrl = form.getAttribute('action');
+                const submitButton = form.querySelector('button[type="submit"]');
+                const originalButtonHtml = submitButton.innerHTML;
+                
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Adding...';
+                
+                try {
+                    const response = await fetch(targetUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    
+                    // Modifikasi logika respons jika pengontrol wishlist Anda belum mendukung JSON penuh
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                        return;
+                    }
+
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        showToastAlert(result.message || 'Added to wishlist');
+                    } else {
+                        alert(result.error || 'Failed to add item to wishlist.');
+                    }
+                } catch (error) {
+                    console.error('AJAX Wishlist operational failure:', error);
+                    // Fallback jika respons bukan JSON (misal redirect standar Express)
+                    window.location.reload();
                 } finally {
                     submitButton.disabled = false;
                     submitButton.innerHTML = originalButtonHtml;
