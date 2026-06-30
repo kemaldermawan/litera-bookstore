@@ -53,6 +53,11 @@
                 </div>
 
                 <div class="col-md-3 col-6">
+                    <label for="discountPrice" class="form-label small fw-bold">Discount Price (IDR)</label>
+                    <input type="number" class="form-control" id="discountPrice" name="discountPrice" value="<%= book.discountPrice || 0 %>" placeholder="Optional" min="0">
+                </div>
+
+                <div class="col-md-3 col-6">
                     <label for="stock" class="form-label small fw-bold">Stock Quantity</label>
                     <input type="number" class="form-control" id="stock" name="stock" min="0" value="<%= book.stock %>" placeholder="e.g., 10" required>
                 </div>

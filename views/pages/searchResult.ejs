@@ -115,7 +115,14 @@
                                 </div>
 
                                 <div>
-                                    <h6 class="text-danger fw-bold mb-3">Rp <%= book.price.toLocaleString('id-ID') %></h6>
+                                    <% if (book.discountPrice && book.discountPrice > 0) { %>
+                                        <div class="mb-3">
+                                            <span class="text-muted text-decoration-line-through font-sm d-block mb-1">Rp <%= book.price.toLocaleString('id-ID') %></span>
+                                            <h6 class="text-danger fw-bold mb-0">Rp <%= book.discountPrice.toLocaleString('id-ID') %></h6>
+                                        </div>
+                                    <% } else { %>
+                                        <h6 class="text-danger fw-bold mb-3">Rp <%= book.price.toLocaleString('id-ID') %></h6>
+                                    <% } %>
                                     
                                     <% if (typeof user !== 'undefined' && user && user.role === 'user') { %>
                                         <div class="row g-2">

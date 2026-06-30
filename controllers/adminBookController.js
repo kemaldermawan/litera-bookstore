@@ -38,7 +38,7 @@ exports.getEditBook = async (req, res) => {
 
 exports.createBook = async (req, res) => {
     try {
-        const { title, author, synopsis, price, stock, category } = req.body;
+        const { title, author, synopsis, price, discountPrice, stock, category } = req.body;
         
         let coverPath = '/img/covers/default.jpg';
         if (req.file) {
@@ -50,6 +50,7 @@ exports.createBook = async (req, res) => {
             author,
             synopsis,
             price: Number(price),
+            discountPrice: Number(discountPrice) || 0,
             stock: Number(stock),
             category,
             coverImage: coverPath
@@ -64,13 +65,14 @@ exports.createBook = async (req, res) => {
 
 exports.updateBook = async (req, res) => {
     try {
-        const { title, author, synopsis, price, stock, category } = req.body;
+        const { title, author, synopsis, price, discountPrice, stock, category } = req.body;
         
         const updatedData = {
             title,
             author,
             synopsis,
             price: Number(price),
+            discountPrice: Number(discountPrice) || 0,
             stock: Number(stock),
             category
         };

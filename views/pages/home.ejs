@@ -80,6 +80,13 @@
                             <div class="card w-100 shadow-sm border-0 book-card-transition p-2 bg-white rounded-3 d-flex flex-column justify-content-between">
                                 <div class="position-relative text-center bg-light rounded p-3 mb-2" style="height: 220px; display: flex; align-items: center; justify-content: center;">
                                     <img src="<%= book.coverImage %>" class="img-fluid rounded shadow-sm" style="max-height: 180px; object-fit: contain;" alt="<%= book.title %>">
+                                    <% if (book.discountPrice && book.discountPrice > 0 && book.discountPrice < book.price) { %>
+                                        <div class="position-absolute top-0 end-0 m-2">
+                                            <span class="badge bg-danger rounded-pill shadow-sm">
+                                                -<%= Math.round(((book.price - book.discountPrice) / book.price) * 100) %>%
+                                            </span>
+                                        </div>
+                                    <% } %>
                                     <% if (book.stock === 0) { %>
                                         <div class="position-absolute top-50 start-50 translate-middle bg-danger bg-opacity-90 text-white fw-bold px-3 py-1 small rounded-pill shadow-sm font-sm">
                                             OUT OF STOCK
@@ -107,7 +114,14 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <h6 class="text-danger fw-bold mb-3">Rp <%= book.price.toLocaleString('id-ID') %></h6>
+                                        <% if (book.discountPrice && book.discountPrice > 0 && book.discountPrice < book.price) { %>
+                                            <div class="mb-3">
+                                                <span class="text-muted text-decoration-line-through font-sm d-block mb-1">Rp <%= book.price.toLocaleString('id-ID') %></span>
+                                                <h6 class="text-danger fw-bold mb-0">Rp <%= book.discountPrice.toLocaleString('id-ID') %></h6>
+                                            </div>
+                                        <% } else { %>
+                                            <h6 class="text-danger fw-bold mb-3">Rp <%= book.price.toLocaleString('id-ID') %></h6>
+                                        <% } %>
                                         
                                         <% if (typeof user !== 'undefined' && user && user.role === 'user') { %>
                                             <div class="row g-2">

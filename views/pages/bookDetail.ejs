@@ -27,7 +27,19 @@
                     <span class="me-3"><i class="bi bi-cart-check me-1"></i>Total Sold: <strong class="text-dark"><%= book.salesCount || 0 %> items</strong></span>
                 </div>
 
-                <h2 class="text-danger fw-extrabold mb-4">Rp <%= book.price.toLocaleString('id-ID') %></h2>
+                <% if (book.discountPrice && book.discountPrice > 0 && book.discountPrice < book.price) { %>
+                    <div class="mb-4 d-flex align-items-center gap-3">
+                        <div>
+                            <span class="text-muted text-decoration-line-through fs-5 d-block">Rp <%= book.price.toLocaleString("id-ID") %></span>
+                            <h2 class="text-danger fw-extrabold mb-0">Rp <%= book.discountPrice.toLocaleString("id-ID") %></h2>
+                        </div>
+                        <span class="badge bg-danger rounded-pill fw-bold">
+                            -<%= Math.round(((book.price - book.discountPrice) / book.price) * 100) %>%
+                        </span>
+                    </div>
+                <% } else { %>
+                    <h2 class="text-danger fw-extrabold mb-4">Rp <%= book.price.toLocaleString("id-ID") %></h2>
+                <% } %>
 
                 <div class="mb-4">
                     <% if (book.stock > 10) { %>
@@ -167,9 +179,14 @@
                             <a href="/store/book/<%= rb._id %>" class="text-decoration-none d-flex align-items-center p-2 rounded hover-bg-light transition-all">
                                 <img src="<%= rb.coverImage %>" alt="<%= rb.title %>" class="rounded border me-3" style="width: 60px; height: 80px; object-fit: cover;">
                                 <div class="text-truncate">
-                                    <h6 class="fw-bold text-dark text-truncate mb-1 small" title="<%= rb.title %>"><%= rb.title %></h6>
+                                    <h6 class="fw-bold text-dark text-truncate mb-1" title="<%= rb.title %>"><%= rb.title %></h6>
                                     <p class="text-muted font-sm mb-1 text-truncate">By <%= rb.author %></p>
-                                    <span class="text-danger fw-bold font-sm">Rp <%= rb.price.toLocaleString('id-ID') %></span>
+                                    <% if (rb.discountPrice && rb.discountPrice > 0) { %>
+                                        <span class="text-muted text-decoration-line-through font-sm d-block" style="font-size: 0.65rem;">Rp <%= rb.price.toLocaleString('id-ID') %></span>
+                                        <span class="text-danger fw-bold font-sm">Rp <%= rb.discountPrice.toLocaleString('id-ID') %></span>
+                                    <% } else { %>
+                                        <span class="text-danger fw-bold font-sm">Rp <%= rb.price.toLocaleString('id-ID') %></span>
+                                    <% } %>
                                 </div>
                             </a>
                         <% }) %>

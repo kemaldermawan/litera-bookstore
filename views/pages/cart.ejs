@@ -45,7 +45,14 @@
                                         <img src="<%= item.coverImage %>" alt="<%= item.title %>" class="rounded border me-3 shadow-sm bg-light" style="width: 70px; height: 95px; object-fit: cover;">
                                         <div class="text-truncate">
                                             <h6 class="fw-bold text-dark text-truncate mb-1" title="<%= item.title %>"><%= item.title %></h6>
-                                            <p class="text-danger fw-semibold font-sm mb-2">Rp <%= item.price.toLocaleString('id-ID') %></p>
+                                            <% if (item.discountPrice && item.discountPrice > 0) { %>
+                                                <div class="mb-2">
+                                                    <span class="text-muted text-decoration-line-through font-sm d-block" style="font-size: 0.7rem;">Rp <%= item.price.toLocaleString('id-ID') %></span>
+                                                    <span class="text-danger fw-semibold font-sm">Rp <%= item.discountPrice.toLocaleString('id-ID') %></span>
+                                                </div>
+                                            <% } else { %>
+                                                <p class="text-danger fw-semibold font-sm mb-2">Rp <%= item.price.toLocaleString('id-ID') %></p>
+                                            <% } %>
                                             
                                             <a href="/cart/delete/<%= item.bookId %>" class="text-secondary hover-danger text-decoration-none small font-sm d-inline-flex align-items-center gap-1">
                                                 <i class="bi bi-trash3-fill"></i> Remove
@@ -67,7 +74,8 @@
                                 
                                 <div class="col-md-3 col-6 text-end">
                                     <span class="fw-bold text-dark">
-                                        Rp <%= (item.price * item.qty).toLocaleString('id-ID') %>
+                                        <% const itemEffectivePrice = (item.discountPrice && item.discountPrice > 0) ? item.discountPrice : item.price; %>
+                                        Rp <%= (itemEffectivePrice * item.qty).toLocaleString('id-ID') %>
                                     </span>
                                 </div>
 

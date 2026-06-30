@@ -17,27 +17,35 @@ exports.checkoutCart = async (req, res) => {
             if (!singleBook) {
                 return res.redirect("/store?error=The requested book could not be found.");
             }
+            const effectivePrice = (singleBook.discountPrice && singleBook.discountPrice > 0) ? singleBook.discountPrice : singleBook.price;
             checkoutItems = [{
                 id: singleBook._id.toString(),
                 title: singleBook.title,
-                price: singleBook.price,
+                price: effectivePrice,
+                originalPrice: singleBook.price,
+                discountPrice: singleBook.discountPrice,
                 quantity: 1,
                 coverImage: singleBook.coverImage
             }];
-            subtotal = singleBook.price;
+            subtotal = effectivePrice;
         } else {
             const sessionCart = req.session.cart || [];
             if (sessionCart.length === 0) {
                 return res.redirect("/cart?error=Checkout initialization failed. Your shopping cart is currently empty.");
             }
 
-            checkoutItems = sessionCart.map(item => ({
-                id: item.bookId,
-                title: item.title,
-                price: item.price,
-                quantity: item.qty,
-                coverImage: item.coverImage 
-            }));
+            checkoutItems = sessionCart.map(item => {
+                const effectivePrice = (item.discountPrice && item.discountPrice > 0) ? item.discountPrice : item.price;
+                return {
+                    id: item.bookId,
+                    title: item.title,
+                    price: effectivePrice,
+                    originalPrice: item.price,
+                    discountPrice: item.discountPrice,
+                    quantity: item.qty,
+                    coverImage: item.coverImage 
+                };
+            });
 
             subtotal = checkoutItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         }
@@ -78,10 +86,11 @@ exports.createOrder = async (req, res) => {
                 return res.redirect("/store?error=The requested book could not be found.");
             }
             const qty = bodyQuantities[bookId] ? parseInt(bodyQuantities[bookId]) : 1;
+            const effectivePrice = (singleBook.discountPrice && singleBook.discountPrice > 0) ? singleBook.discountPrice : singleBook.price;
             activeCart = [{
                 bookId: singleBook._id.toString(),
                 title: singleBook.title,
-                price: singleBook.price,
+                price: effectivePrice,
                 qty: qty,
                 coverImage: singleBook.coverImage
             }];
@@ -110,10 +119,11 @@ exports.createOrder = async (req, res) => {
                 return res.redirect(`/cart?error=Reservation failed. "${item.title}" only has ${currentBook.stock} units available.`);
             }
 
+            const effectivePrice = (item.discountPrice && item.discountPrice > 0) ? item.discountPrice : item.price;
             items.push({
                 book: item.bookId,
                 quantity: finalQty,
-                priceAtPurchase: item.price
+                priceAtPurchase: effectivePrice
             });
         }
 

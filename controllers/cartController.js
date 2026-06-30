@@ -6,7 +6,8 @@ exports.getCart = (req, res) => {
 
         let subtotal = 0;
         cart.forEach(item => {
-            subtotal += item.price * item.qty;
+            const effectivePrice = (item.discountPrice && item.discountPrice > 0) ? item.discountPrice : item.price;
+            subtotal += effectivePrice * item.qty;
         });
 
         const total = subtotal;
@@ -53,11 +54,15 @@ exports.addToCart = async (req, res) => {
                 return res.redirect('/cart?error=Cannot add more items. Physical shelf inventory limit reached.');
             }
             existingItem.qty += 1;
+            // Update prices in case they changed since last add
+            existingItem.price = book.price;
+            existingItem.discountPrice = book.discountPrice;
         } else {
             cart.push({
                 bookId: book._id.toString(),
                 title: book.title,
                 price: book.price,
+                discountPrice: book.discountPrice,
                 coverImage: book.coverImage,
                 stock: book.stock,
                 qty: 1
