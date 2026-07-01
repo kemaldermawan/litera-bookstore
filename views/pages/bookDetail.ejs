@@ -216,7 +216,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        // Penanganan asinkron untuk tombol Keranjang
         const cartForms = document.querySelectorAll('.ajax-cart-form');
         cartForms.forEach(form => {
             form.addEventListener('submit', async (event) => {
@@ -253,7 +252,6 @@
             });
         });
 
-        // Penanganan asinkron untuk tombol Wishlist
         const wishlistForms = document.querySelectorAll('.ajax-wishlist-form');
         wishlistForms.forEach(form => {
             form.addEventListener('submit', async (event) => {
@@ -274,7 +272,6 @@
                         }
                     });
                     
-                    // Modifikasi logika respons jika pengontrol wishlist Anda belum mendukung JSON penuh
                     if (response.redirected) {
                         window.location.href = response.url;
                         return;
@@ -288,7 +285,6 @@
                     }
                 } catch (error) {
                     console.error('AJAX Wishlist operational failure:', error);
-                    // Fallback jika respons bukan JSON (misal redirect standar Express)
                     window.location.reload();
                 } finally {
                     submitButton.disabled = false;

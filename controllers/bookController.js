@@ -132,7 +132,6 @@ exports.searchBooks = async (req, res, next) => {
             });
         }
 
-        // Map frontend sort parameters to Mongoose sort objects
         let sortOption = {};
         if (sort === 'price_asc') {
             sortOption = { price: 1 };
@@ -142,7 +141,6 @@ exports.searchBooks = async (req, res, next) => {
             sortOption = { salesCount: -1 };
         }
 
-        // Build search query conditions
         const findQuery = {
             $or: [
                 { title: { $regex: query, $options: 'i' } },

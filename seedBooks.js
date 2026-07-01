@@ -20,7 +20,6 @@ const bookSchema = new mongoose.Schema({
 const Book = mongoose.models.Book || mongoose.model('Book', bookSchema);
 
 const comprehensiveRetailInventory = [
-    // === GENRE: FICTION (7 Books) ===
     {
         title: "The Great Gatsby",
         author: "F. Scott Fitzgerald",
@@ -99,7 +98,6 @@ const comprehensiveRetailInventory = [
         createdAt: new Date("2026-01-07")
     },
 
-    // === GENRE: SELF-DEVELOPMENT (6 Books) ===
     {
         title: "Atomic Habits",
         author: "James Clear",
@@ -167,7 +165,6 @@ const comprehensiveRetailInventory = [
         createdAt: new Date("2026-01-13")
     },
 
-    // === GENRE: NON-FICTION (6 Books) ===
     {
         title: "Sapiens",
         author: "Yuval Noah Harari",
@@ -235,7 +232,6 @@ const comprehensiveRetailInventory = [
         createdAt: new Date("2026-01-19")
     },
 
-    // === GENRE: COMIC & GRAPHIC NOVELS (6 Books) ===
     {
         title: "One Piece, Vol. 1",
         author: "Eiichiro Oda",
@@ -303,7 +299,6 @@ const comprehensiveRetailInventory = [
         createdAt: new Date("2026-01-25")
     },
 
-    // === GENRE: TECHNOLOGY & SCIENCE (5 Books) ===
     {
         title: "Clean Code",
         author: "Robert C. Martin",
@@ -360,7 +355,6 @@ const comprehensiveRetailInventory = [
         createdAt: new Date("2026-01-30")
     },
 
-    // === GENRE: BIOGRAPHY & HISTORY (5 Books) ===
     {
         title: "Steve Jobs",
         author: "Walter Isaacson",
@@ -370,7 +364,7 @@ const comprehensiveRetailInventory = [
         stock: 8,
         coverImage: "https://images-na.ssl-images-amazon.com/images/I/81VStYfLkGL.jpg",
         soldCount: 0,
-        createdAt: new Date("2026-05-18") // Newest Date 1
+        createdAt: new Date("2026-05-18")
     },
     {
         title: "Elon Musk",
@@ -381,7 +375,7 @@ const comprehensiveRetailInventory = [
         stock: 12,
         coverImage: "https://images-na.ssl-images-amazon.com/images/I/81979v5mE6L.jpg",
         soldCount: 0,
-        createdAt: new Date("2026-05-19") // Newest Date 2
+        createdAt: new Date("2026-05-19")
     },
     {
         title: "The Diary of a Young Girl",
@@ -392,7 +386,7 @@ const comprehensiveRetailInventory = [
         stock: 15,
         coverImage: "https://images-na.ssl-images-amazon.com/images/I/810u9M74pSL.jpg",
         soldCount: 0,
-        createdAt: new Date("2026-05-20") // Newest Date 3
+        createdAt: new Date("2026-05-20")
     },
     {
         title: "Alexander the Great",
@@ -403,7 +397,7 @@ const comprehensiveRetailInventory = [
         stock: 7,
         coverImage: "https://images-na.ssl-images-amazon.com/images/I/71x4N+n6RKL.jpg",
         soldCount: 0,
-        createdAt: new Date("2026-05-21") // Newest Date 4
+        createdAt: new Date("2026-05-21")
     },
     {
         title: "Leonardo da Vinci",
@@ -414,7 +408,7 @@ const comprehensiveRetailInventory = [
         stock: 5,
         coverImage: "https://images-na.ssl-images-amazon.com/images/I/816aRzXylmL.jpg",
         soldCount: 0,
-        createdAt: new Date("2026-05-22") // Newest Date 5
+        createdAt: new Date("2026-05-22")
     }
 ];
 

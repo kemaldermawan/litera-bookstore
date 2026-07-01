@@ -2,9 +2,6 @@ const User = require('../models/User');
 const Order = require('../models/Order');
 const Review = require('../models/Review');
 
-/**
- * Render the user's secure profile dashboard.
- */
 exports.getProfile = async (req, res) => {
     try {
         const userId = req.session.user.id;
@@ -50,9 +47,6 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-/**
- * Render the profile modification form layout.
- */
 exports.getEditProfile = async (req, res) => {
     try {
         if (!req.session.user) {
@@ -75,9 +69,6 @@ exports.getEditProfile = async (req, res) => {
     }
 };
 
-/**
- * Process text parameters, logistics addresses, and physical binary file uploads for user profiles.
- */
 exports.postEditProfile = async (req, res) => {
     try {
         if (!req.session.user) {
@@ -126,9 +117,6 @@ exports.postEditProfile = async (req, res) => {
     }
 };
 
-/**
- * Execute critical account erasure operational processes.
- */
 exports.deleteAccount = async (req, res) => {
     try {
         if (!req.session.user) {

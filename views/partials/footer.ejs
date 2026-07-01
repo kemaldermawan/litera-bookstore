@@ -1,53 +1,53 @@
-<footer class="bg-dark text-light py-5 mt-auto border-top border-secondary border-opacity-25" style="font-size: 0.9rem;">
+<footer class="bg-dark text-white py-5 mt-auto border-top border-secondary border-opacity-25" style="font-size: 0.9rem;">
     <div class="container-fluid px-4">
         <div class="row g-4">
             
             <div class="col-md-4 mb-3">
-                <h5 class="fw-bold text-primary text-uppercase letter-spacing-1 mb-3">Litera</h5>
-                <p class="text-white-50 lh-relaxed">
+                <h5 class="fw-bold text-white text-uppercase letter-spacing-1 mb-3">Litera</h5>
+                <p class="text-white lh-relaxed">
                     Our mission is to provide the most comprehensive collection of literary works from around the globe to readers in Indonesia, backed by swift operations and competitive retail pricing benchmarks.
                 </p>
             </div>
             
             <div class="col-md-3 mb-3 ms-auto">
                 <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
-                    <h5 class="fw-bold text-warning mb-3"><i class="bi bi-shield-lock me-2"></i>Database Controls</h5>
+                    <h5 class="fw-bold text-white mb-3">Database Controls</h5>
                     <ul class="list-unstyled d-flex flex-column gap-2">
-                        <li><a href="/admin/dashboard" class="text-white-50 text-decoration-none custom-footer-link small"><i class="bi bi-speedometer2 me-1"></i>Admin Control Panel</a></li>
-                        <li><a href="/admin/books" class="text-white-50 text-decoration-none custom-footer-link small"><i class="bi bi-journal-plus me-1"></i>Manage Book Inventory</a></li>
-                        <li><a href="/admin/orders" class="text-white-50 text-decoration-none custom-footer-link small"><i class="bi bi-receipt me-1"></i>Customer Order Registry</a></li>
-                        <li><a href="/admin/reviews" class="text-white-50 text-decoration-none custom-footer-link small"><i class="bi bi-chat-left-quote me-1"></i>Review Moderation Pipeline</a></li>
+                        <li><a href="/admin/dashboard" class="text-white text-decoration-none custom-footer-link small">Main Dashboard</a></li>
+                        <li><a href="/admin/dashboard" class="text-white text-decoration-none custom-footer-link small">Book & Discount Management</a></li>
+                        <li><a href="/admin/dashboard" class="text-white text-decoration-none custom-footer-link small">Customer Order Registry</a></li>
+                        <li><a href="/store" target="_blank" class="text-white text-decoration-none custom-footer-link small">View Live Storefront</a></li>
                     </ul>
                 <% } else { %>
-                    <h5 class="fw-bold text-light mb-3">Store Collections</h5>
+                    <h5 class="fw-bold text-white mb-3">Store Collections</h5>
                     <ul class="list-unstyled d-flex flex-column gap-2">
-                        <li><a href="/search?q=Fiction" class="text-white-50 text-decoration-none custom-footer-link small">Fiction Masterpieces</a></li>
-                        <li><a href="/search?q=Non-Fiction" class="text-white-50 text-decoration-none custom-footer-link small">Non-Fiction & Philosophy</a></li>
-                        <li><a href="/search?q=Technology" class="text-white-50 text-decoration-none custom-footer-link small">Technology & Science</a></li>
-                        <li><a href="/search?q=Comic" class="text-white-50 text-decoration-none custom-footer-link small">Comics & Graphic Novels</a></li>
+                        <li><a href="/search?q=Fiction" class="text-white text-decoration-none custom-footer-link small">Fiction Masterpieces</a></li>
+                        <li><a href="/search?q=Non-Fiction" class="text-white text-decoration-none custom-footer-link small">Non-Fiction & Philosophy</a></li>
+                        <li><a href="/search?q=Technology" class="text-white text-decoration-none custom-footer-link small">Technology & Science</a></li>
+                        <li><a href="/search?q=Comic" class="text-white text-decoration-none custom-footer-link small">Comics & Graphic Novels</a></li>
                     </ul>
                 <% } %>
             </div>
 
             <div class="col-md-3 mb-3">
-                <h5 class="fw-bold text-light mb-3">Account Framework</h5>
+                <h5 class="fw-bold text-white mb-3">Account Framework</h5>
                 <ul class="list-unstyled d-flex flex-column gap-2">
                     
                     <% if (typeof user !== 'undefined' && user) { %>
                         <% if (user.role === 'admin') { %>
-                            <li><a href="/auth/profile" class="text-white-50 text-decoration-none custom-footer-link small"></i>Admin Profile Console</a></li>
-                            <li><a href="/auth/profile/edit" class="text-white-50 text-decoration-none custom-footer-link small"></i>System Preferences</a></li>
-                            <li><a href="/auth/logout" class="text-danger-emphasis text-decoration-none custom-footer-link small fw-semibold"></i>Terminate System Session</a></li>
+                            <li><a href="/auth/profile" class="text-white text-decoration-none custom-footer-link small">Admin Profile</a></li>
+                            <li><a href="/auth/profile/edit" class="text-white text-decoration-none custom-footer-link small">Edit Profile</a></li>
+                            <li><a href="/auth/logout" class="text-white text-decoration-none custom-footer-link small fw-semibold">Sign Out</a></li>
                         <% } else if (user.role === 'user') { %>
-                            <li><a href="/auth/profile" class="text-white-50 text-decoration-none custom-footer-link small">My Account Profile</a></li>
-                            <li><a href="/cart" class="text-white-50 text-decoration-none custom-footer-link small">My Shopping Cart</a></li>
-                            <li><a href="/orders/history" class="text-white-50 text-decoration-none custom-footer-link small">Historical Invoice Tracking</a></li>
-                            <li><a href="/auth/logout" class="text-white-50 text-decoration-none custom-footer-link small">Sign Out</a></li>
+                            <li><a href="/auth/profile" class="text-white text-decoration-none custom-footer-link small">My Account Profile</a></li>
+                            <li><a href="/cart" class="text-white text-decoration-none custom-footer-link small">My Shopping Cart</a></li>
+                            <li><a href="/wishlist" class="text-white text-decoration-none custom-footer-link small">My Wishlist</a></li>
+                            <li><a href="/auth/logout" class="text-white text-decoration-none custom-footer-link small">Sign Out</a></li>
                         <% } %>
                     <% } else { %>
-                        <li><a href="/auth/login" class="text-white-50 text-decoration-none custom-footer-link small"></i>Sign In</a></li>
-                        <li><a href="/auth/register" class="text-white-50 text-decoration-none custom-footer-link small"></i>New Account</a></li>
-                        <li><a href="/store" class="text-white-50 text-decoration-none custom-footer-link small">Catalog</a></li>
+                        <li><a href="/auth/login" class="text-white text-decoration-none custom-footer-link small">Sign In</a></li>
+                        <li><a href="/auth/register" class="text-white text-decoration-none custom-footer-link small">New Account</a></li>
+                        <li><a href="/store" class="text-white text-decoration-none custom-footer-link small">Catalog</a></li>
                     <% } %>
                     
                 </ul>
@@ -58,7 +58,7 @@
         <hr class="my-4 border-secondary border-opacity-50">
         <div class="row">
             <div class="col-12 text-center">
-                <p class="text-white-50 small mb-2">&copy; 2026 Litera Bookstore. All Rights Reserved.</p>
+                <p class="text-white small mb-2">&copy; 2026 Litera Bookstore. All Rights Reserved.</p>
             </div>
         </div>
     </div>
